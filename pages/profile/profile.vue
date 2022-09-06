@@ -1,94 +1,113 @@
 <template>
-	<view class="profile">
-		<!-- 我的 -->
-		<view class="header_img_backImg">
-			<image src="@/static/images/wdbj.png" mode="aspectFill"></image>
-		</view>
-		<view class="content_wrap">
-			<view class="content_wrap_header flex_ali">
-				<image :src="userImg" mode="aspectFill"></image>
-				<view class="">
-					{{userName}}
-				</view>
-			</view>
-			<view class="content_card area2">
-				<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/myIntegral/myIntegral`)">
-					<view class=" flex_ali">
-						<image class="img" src="@/static/images/wdjf.png" mode="aspectFit"></image>
-						<view class="">
-							我的积分
-						</view>
-					</view>
-					<view class=" flex_ali">
-						<view class="integral_num">
-							{{integral}}
-						</view>
-						<view class="icon icon-youjiantou icon_r"></view>
-					</view>
-				</view>
-				<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/myRelease/myRelease`)">
-					<view class=" flex_ali">
-						<image class="img2" src="@/static/images/wdfb.png" mode="aspectFit"></image>
-						<view class="">
-							我的发布
-						</view>
-					</view>
-					<view class="icon icon-youjiantou icon_r"></view>
-				</view>
-			</view>
+	
+	<view class="">
+		<topbar bg_color="#ED4149">
+			<text style="color: #fff;"></text>
+			<text style="color: #fff;">我的</text>
+			<text style="color: #fff;"></text>
+		</topbar>
+		<view class="profile">
 			
-			<view class="content_card area2">
-				<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/makeMoney/makeMoney`)">
-					<view class=" flex_ali">
-						<image class="img5" src="@/static/images/wyzq.png" mode="aspectFit"></image>
-						<view class="">
-							我要赚钱
+			<!-- 我的 -->
+			<view class="header_img_backImg">
+				<image src="@/static/images/wdbj.png" mode="aspectFill"></image>
+			</view>
+			<view class="content_wrap">
+				<view class="content_wrap_header flex_ali">
+					<image v-if="hasLogin" :src="$service.getimg(loginDatas.img)" mode="aspectFill"></image>
+					<image v-else :src="$service.getimg('/static/images/tx.jpg')" mode="aspectFill"></image>
+					<view v-if="hasLogin" class="">
+						{{loginDatas.nick}}
+					</view>
+					<view v-else class="" @click="$service.jump" data-url="/pages/login/login">
+						未登录
+					</view>
+				</view>
+				<view class="content_card area2">
+					<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/myIntegral/myIntegral`)">
+						<view class=" flex_ali">
+							<image class="img" src="@/static/images/wdjf.png" mode="aspectFit"></image>
+							<view class="">
+								我的积分
+							</view>
+						</view>
+						<view class=" flex_ali">
+							<view class="integral_num">
+								{{loginDatas.people||'0'}}
+							</view>
+							<view class="icon icon-youjiantou icon_r"></view>
 						</view>
 					</view>
-					<view class=" flex_ali">
+					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/myRelease/myRelease`)">
+						<view class=" flex_ali">
+							<image class="img2" src="@/static/images/wdfb.png" mode="aspectFit"></image>
+							<view class="">
+								我的发布
+							</view>
+						</view>
 						<view class="icon icon-youjiantou icon_r"></view>
 					</view>
 				</view>
-				<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/InvitationRecord/InvitationRecord`)">
-					<view class=" flex_ali">
-						<image class="img6" src="@/static/images/yqjl.png" mode="aspectFit"></image>
-						<view class="">
-							邀请记录
+				
+				<view class="content_card area2">
+					<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/makeMoney/makeMoney`)">
+						<view class=" flex_ali">
+							<image class="img5" src="@/static/images/wyzq.png" mode="aspectFit"></image>
+							<view class="">
+								我要赚钱
+							</view>
+						</view>
+						<view class=" flex_ali">
+							<view class="icon icon-youjiantou icon_r"></view>
 						</view>
 					</view>
-					<view class="icon icon-youjiantou icon_r"></view>
-				</view>
-			</view>
-
-			<view class="content_card area2">
-				<view class="card_each border_botm flex_bet" @tap="call(phone)">
-					<view class=" flex_ali">
-						<image class="img3" src="@/static/images/lxkf.png" mode="aspectFit"></image>
-						<view class="">
-							联系客服
+					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/InvitationRecord/InvitationRecord`)">
+						<view class=" flex_ali">
+							<image class="img6" src="@/static/images/yqjl.png" mode="aspectFit"></image>
+							<view class="">
+								邀请记录
+							</view>
 						</view>
-					</view>
-					<view class="phone_num">
-						{{phone}}
+						<view class="icon icon-youjiantou icon_r"></view>
 					</view>
 				</view>
-				<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/aboutMy/aboutMy`)">
-					<view class=" flex_ali">
-						<image class="img4" src="@/static/images/gywm.png" mode="aspectFit"></image>
-						<view class="">
-							关于我们
-						</view>
-					</view>
-					<view class="icon icon-youjiantou icon_r"></view>
-				</view>
-			</view>
-		</view>
 		
-		<popUp :isShow="isShow" v-model="isShow"></popUp>
+				<view class="content_card area2">
+					<view class="card_each border_botm flex_bet" @tap="call(phone)">
+						<view class=" flex_ali">
+							<image class="img3" src="@/static/images/lxkf.png" mode="aspectFit"></image>
+							<view class="">
+								联系客服
+							</view>
+						</view>
+						<view class="phone_num">
+							{{phone}}
+						</view>
+					</view>
+					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/aboutMy/aboutMy`)">
+						<view class=" flex_ali">
+							<image class="img4" src="@/static/images/gywm.png" mode="aspectFit"></image>
+							<view class="">
+								关于我们
+							</view>
+						</view>
+						<view class="icon icon-youjiantou icon_r"></view>
+					</view>
+				</view>
+			</view>
+			<tab-list pageurl="/pages/profile/profile"></tab-list>
+			<!-- <popUp :isShow="isShow" v-model="isShow"></popUp> -->
+		</view>
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
@@ -98,6 +117,9 @@
 				phone: "", //联系客服
 				isShow: true, //弹窗广告
 			}
+		},
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','loginDatas','basedata']),
 		},
 		onLoad() {
 			this.getCate()

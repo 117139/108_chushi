@@ -29,9 +29,14 @@ const store = new Vuex.Store({
 		
 		
 		Storedatas:'', //店长信息
+		
+		
+		tab_list:[]
 	},
 	mutations: {
-		
+		set_tab_list(state, tab_list) {
+			state.tab_list = tab_list||[]
+		},
 		set_basedata(state, basedata) {
 			state.basedata = basedata||[]
 		},
@@ -44,7 +49,9 @@ const store = new Vuex.Store({
 			console.log('loginDatas---->')
 			console.log(state.loginDatas)
 			uni.setStorageSync('loginDatas', loginDatas)
-			
+			if(loginDatas.token){
+				uni.setStorageSync('token',loginDatas.token)
+			}
 			console.log('token',uni.getStorageSync('token'))
 			
 			

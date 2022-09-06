@@ -1,13 +1,154 @@
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that
 	export default {
 		onLaunch: function() {
+			that=this
 			console.log('App Launch')
+			var token =uni.getStorageSync('token')
+			if(token){
+				that.$service.wxlogin('token')
+			}
+			that.gettabs()
+			that.getbasedata()
+			uni.$on('login_fuc', (data) => {
+					console.log('标题：' + data.title)
+					console.log('内容：' + data.content)
+					that.getbasedata()
+					that.$service.wxlogin('token')
+			})
+			uni.getSystemInfo({
+				success: function(e) {
+					that.$store.commit('setplatform', e.platform)
+					// #ifndef MP
+					Vue.prototype.StatusBar = e.statusBarHeight;
+					if (e.platform == 'android') {
+						Vue.prototype.CustomBar = e.statusBarHeight + 50;
+					} else {
+						Vue.prototype.CustomBar = e.statusBarHeight + 45;
+					};
+					// #endif
+					// #ifdef MP-WEIXIN
+					Vue.prototype.StatusBar = e.statusBarHeight;
+					let custom = wx.getMenuButtonBoundingClientRect();
+					Vue.prototype.Custom = custom;
+					Vue.prototype.CustomBar = custom.bottom + custom.top - e.statusBarHeight;
+					// #endif       
+					// #ifdef MP-ALIPAY
+					Vue.prototype.StatusBar = e.statusBarHeight;
+					Vue.prototype.CustomBar = e.statusBarHeight + e.titleBarHeight;
+					// #endif
+				}
+			})
 		},
 		onShow: function() {
 			console.log('App Show')
 		},
 		onHide: function() {
 			console.log('App Hide')
+		},
+		
+		methods:{
+			gettabs(){
+				var datas={}
+				var jkurl='/index/tab'
+				
+				that.$service.P_get(jkurl, datas).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						that.$store.commit('set_tab_list',res.data)
+						// that.getdata_tz()
+						// if(datas.title){
+						// 	uni.setNavigationBarTitle({
+						// 		title:datas.title
+						// 	})
+						// }
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
+			getbasedata(){
+				var datas={}
+				var jkurl='/login/weizhi'
+				
+				that.$service.P_get(jkurl, datas).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						that.$store.commit('set_basedata',res.data)
+						// that.getdata_tz()
+						// if(datas.title){
+						// 	uni.setNavigationBarTitle({
+						// 		title:datas.title
+						// 	})
+						// }
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
 		}
 	}
 </script>
@@ -215,5 +356,47 @@
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		
+	}
+	.my_tabbar_box{
+		padding-bottom: 100rpx;
+		padding-bottom: calc(100rpx + constant(safe-area-inset-bottom));
+		padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
+	}
+	.my_tabbar{
+		width: 100%;
+		position: fixed;
+		bottom: 0;
+		// bottom: 100rpx;
+		left: 0;
+		right: 0;
+		z-index: 900;
+		padding-bottom: 0;
+		padding-bottom: constant(safe-area-inset-bottom);
+		padding-bottom: env(safe-area-inset-bottom);
+		background: #fff;
+		display: flex;
+		align-items: stretch;
+		justify-content: space-around;
+		.my_tabbar_li{
+			height: 100rpx;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			image{
+				width: 48rpx;
+				height: 48rpx;
+			}
+			text{
+				margin-top: 6rpx;
+				text-align: center;
+				font-size: 20rpx;
+				line-height: normal;
+				color: #bbb;
+				&.active{
+					color: #ed4149;
+				}
+			}
+		}
 	}
 </style>

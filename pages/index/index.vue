@@ -1,5 +1,5 @@
 <template>
-	<view class="content">
+	<view class="content ">
 		<!-- 搜索框 -->
 		<view class="header_search area flex_bet">
 			<view class="header_address flex_cen" @tap="$sjuNav.navTo(`/pages/selectAddress/selectAddress`)">
@@ -100,11 +100,17 @@
 			<image src="/static/images/sj.png" mode="aspectFit"></image>
 			<!-- #endif -->
 		</view>
-
+		<tab-list pageurl="/pages/index/index"></tab-list>
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
@@ -161,6 +167,10 @@
 
 
 			}
+		},
+		
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list']),
 		},
 		onLoad() {
 

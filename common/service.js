@@ -6,8 +6,8 @@ const STATE_KEY = 'STATE_KEY';
 const map_key = "7FEBZ-WLWK2-PMGUE-C4BFT-EKXB6-BFFNR"
 const appVN=1
 // const baseurl = "https://ayi.a.800123456.vip/"
-// const baseurl = "http://192.168.0.105/"
-const baseurl = "http://tumei.xyz/"
+const baseurl = "http://192.168.0.108/"
+// const baseurl = "http://tumei.xyz/"
 let imgurl = baseurl
 var  IPurl = baseurl + 'api/'
 
@@ -285,7 +285,7 @@ const wxlogin = function(num) {
 		var data = {
 			token: uni.getStorageSync('token'),
 			
-			type: 2
+			type: 3
 		}
 
 		uni.request({

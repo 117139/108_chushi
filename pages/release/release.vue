@@ -1,5 +1,10 @@
 <template>
 	<view class="release">
+		<topbar bg_color="#ED4149">
+			<text style="color: #fff;"></text>
+			<text style="color: #fff;">发布</text>
+			<text style="color: #fff;"></text>
+		</topbar>
 		<!-- 发布 -->
 		<view class="header_top area">
 			<view class="words_box area2" v-html="wordsText"></view>
@@ -77,7 +82,7 @@
 		<view class="btn_bottom area2" @tap="$sjuNav.navTo(`/pages/status/status`)">
 			确认发布
 		</view>
-
+		<tab-list pageurl="/pages/release/release"></tab-list>
 	</view>
 </template>
 
@@ -169,7 +174,7 @@
 			height: auto;
 			background-color: #fff;
 			padding-bottom: 24rpx;
-
+			padding-top: 20rpx;
 			.words_box {
 				height: auto;
 				line-height: 40rpx;
@@ -180,7 +185,7 @@
 				font-weight: 400;
 				color: #FFFFFF;
 				padding: 14rpx 28rpx;
-				margin-top: 20rpx;
+				// margin-top: 20rpx;
 			}
 
 			.sort_wrap {

@@ -9,6 +9,11 @@ Vue.prototype.$Store = store;
 import sjuNav from './common/sju.nav.js'
 Vue.prototype.$sjuNav = sjuNav
 
+
+import topbar from './components/top_bar/top_bar.vue'
+Vue.component('topbar',topbar)
+import tabList from '@/components/tab-list/tab-list.vue'
+Vue.component('tab-list',tabList)
 // #ifndef VUE3
 import Vue from 'vue'
 Vue.config.productionTip = false
