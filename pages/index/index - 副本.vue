@@ -14,7 +14,7 @@
 		</view>
 
 		<!-- 主体内容 -->
-		<view v-if="basedata.statement_1" class="words_box area2">{{basedata.statement_1}}</view>
+		<view v-if="basedata.statement_1" class="words_box area2" v-html="basedata.statement_1"></view>
 
 		<!-- <view class="advertisement_wrap area2">
 			<image :src="imgUrl" mode="aspectFill"></image>
@@ -27,12 +27,11 @@
 			<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
 		</view>
 		<!-- #endif -->
-		<!-- ad -->
 		<view class="notice area2 flex_bet" @tap="$sjuNav.navTo(`/pages/announcement/announcement`)">
 			<image src="/static/images/ptgg.png" mode="aspectFit"></image>
 			<swiper class="swiper_wrap" :autoplay="true" :interval="3000" :duration="1000" circular vertical>
 				<swiper-item v-for="(item,index) in noticeText" :key="index">
-					<view class="swiper-item">{{item.title}}</view>
+					<view class="swiper-item" v-html="item"></view>
 				</swiper-item>
 			</swiper>
 		</view>
@@ -44,64 +43,54 @@
 					{{item.title}}
 				</view>
 			</view>
-			<block  v-for="(item,index) in datas" :key="index">
-			<view class="list_box"  @click="$service.jump" :data-url="'/pages/orderDetails/orderDetails?id='+item.id">
+
+			<view class="list_box" v-for="(item,index) in list" :key="index"  @tap="$sjuNav.navTo(`/pages/orderDetails/orderDetails`)">
 				<view class="list_header flex_bet">
 					<view class="list_header_l flex_ali">
-						<image v-if="item.user" :src="$service.getimg(item.user.img)" mode="aspectFill"></image>
+						<image :src="item.userImg" mode="aspectFill"></image>
 						<view class="list_header_text">
-							<view v-if="item.user" class="">
-								{{item.user.nick}}
+							<view class="">
+								{{item.userName}}
 							</view>
 							<view class="list_header_time">
-								{{item.update_time}}
+								{{item.time}}
 							</view>
 						</view>
 					</view>
-					<view class="istop" v-if="item.is_top==1">
+					<view class="istop">
 						置顶
 					</view>
 				</view>
-				<view class="words_text oh2">
-					{{$service.LNum(item.content,35)}}
-					<text class="detailed_text ">
-						详情
-					</text>
-					<text class="icon icon-youjiantou detailed_icon"></text>
+				<view class="words_text">
+					<view v-html="item.contentText"></view>
+					<view class="detailed_text flex_cen">
+						详情<text class="icon icon-youjiantou detailed_icon"></text>
+					</view>
 				</view>
 
-				<view v-if="item.img_arr.length>0" class="img_list flex">
-					<view class="img_li" v-for="(item1,index2) in item.img_arr" :key="index2">
-						<image lazy-load="true" :src="$service.getimg(item1)" mode="aspectFill"></image>
+				<view class="img_list flex">
+					<view class=" " v-for="(item,index2) in item.imgUrl" :key="index2">
+						<image :src="item" mode="aspectFill"></image>
 					</view>
 				</view>
 				<view class="list_botm flex_bet">
 					<view class=" flex_ali">
 						<text class="icon icon-dizhi add_icon"></text>
-						<view class="add_box oh1">
+						<view class="">
 							{{item.address}}
 						</view>
 					</view>
 					<view class="range">
-						距离{{$service.getKm(item.distance)}}
+						距离{{item.rangeNum}}km
 					</view>
 				</view>
-				
-				
-				
 			</view>
-			<!-- #ifdef MP-WEIXIN -->
-			<view class="advertisement_wrap2" v-if="index>0 && index%banner_interval==0	">
-				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
-			</view>
-			<!-- #endif -->
-			</block>
-			<!-- <view class="advertisement_wrap2">
+			<view class="advertisement_wrap2">
 				<image :src="imgUrl2" mode="aspectFill"></image>
 				<view class="advertisement_text">
 					广告
 				</view>
-			</view> -->
+			</view>
 		</view>
 		<view class="botm_img flex_dir">
 			<image src="/static/images/hb.png" mode="aspectFit"></image>
@@ -125,20 +114,59 @@
 		mapState,
 		mapMutations
 	} from 'vuex'
-	var that = null
+	var that 
 	let videoAd = null
 	export default {
 		data() {
 			return {
 				address: "北京市", //定位地址
 				value: '', //头部搜索框
-				wordsText: ``,
+				wordsText: `免责声明:平台仅提供信息展示发布服务，所有信息与平台无关，
+				用户需自行承担使用本平台可能产生的风险，如有异议请自行退出平台，谢谢配合。`,
 				imgUrl: "/static/images/ggt.png", //广告图片
 				imgUrl2: "/static/images/jhs.png", //广告图片
 				noticeText: [ //平台公告
-					
+					"这里是平台公告的文案，这里是公告文案这里是平台公告的文案，这里是公告文案这里是平台公告的文案，这里是公告文案",
+					"这里是平台公告的文案，这里是公告文案这里是平台公告的文案，这里是公告文案这里是平台",
+					"这里是平台公告的文案，这里是公告文案"
 				],
-				list: [],
+				list: [{
+					userImg: '/static/images/tx.jpg',
+					userName: "ZP056789",
+					time: "2022-08-02 22:14",
+					contentText: `急招烧烤师傅合作！地址在北京市王府井街道，
+						地段繁华，有100平门店，人流旺停车方便 `,
+					imgUrl: ['/static/images/tp.png', '/static/images/tp2.png', '/static/images/tp3.png',
+						'/static/images/tp4.png',
+					],
+					address:"北京市东城区王府井大街",//定位地址
+					rangeNum:'1.3',//距离
+				}, 
+				{
+					userImg: '/static/images/tx.jpg',
+					userName: "ZP056789",
+					time: "2022-08-02 22:14",
+					contentText: `急招烧烤师傅合作！地址在北京市王府井街道，
+						地段繁华，有100平门店，人流旺停车方便 `,
+					imgUrl: ['/static/images/tp.png', '/static/images/tp2.png', '/static/images/tp3.png',
+						'/static/images/tp4.png',
+					],
+					address:"北京市东城区王府井大街",//定位地址
+					rangeNum:'1.3',//距离
+				},
+				{
+					userImg: '/static/images/tx.jpg',
+					userName: "ZP056789",
+					time: "2022-08-02 22:14",
+					contentText: `急招烧烤师傅合作！地址在北京市王府井街道，
+						地段繁华，有100平门店，人流旺停车方便 `,
+					imgUrl: ['/static/images/tp.png', '/static/images/tp2.png', '/static/images/tp3.png',
+						'/static/images/tp4.png',
+					],
+					address:"北京市东城区王府井大街",//定位地址
+					rangeNum:'1.3',//距离
+				}
+				],
 				
 				
 				tabs: [],
@@ -150,11 +178,10 @@
 		},
 		
 		computed: {
-			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
 		},
 		onLoad() {
 			that=this
-			that.getnotice()
 			that.gettype()
 			// #ifdef MP-WEIXIN
 			if (wx.createRewardedVideoAd) {
@@ -191,54 +218,6 @@
 				}
 				/* #endif */
 			},
-			//公告
-			getnotice(){
-				var jkurl='/index/notice'
-				var datas={}
-				var header={
-					'content-type': 'application/json',
-				}
-				that.$service.P_post(jkurl, datas,header).then(res => {
-					that.btnkg = 0
-					console.log(res)
-					if (res.code == 1) {
-						that.htmlReset = 0
-						var datas = res.data
-						console.log(typeof datas)
-				
-						if (typeof datas == 'string') {
-							datas = JSON.parse(datas)
-						}
-						console.log(res)
-						
-						that.noticeText=datas.data
-					} else {
-					
-						if (res.msg) {
-							uni.showToast({
-								icon: 'none',
-								title: res.msg
-							})
-						} else {
-							uni.showToast({
-								icon: 'none',
-								title: '获取数据失败'
-							})
-						}
-					}
-				}).catch(e => {
-					that.htmlReset = 1
-					that.btnkg = 0
-					// that.$refs.htmlLoading.htmlReset_fuc(1)
-					console.log(e)
-					uni.showToast({
-						icon: 'none',
-						title: '获取数据失败，请检查您的网络连接'
-					})
-				})
-			},
-			
-			//分类
 			gettype(){
 				var jkurl='/index/sub_classify'
 				var datas={}
@@ -426,7 +405,7 @@
 		}
 
 		.advertisement_wrap {
-			// height: 286rpx;
+			height: 286rpx;
 			border-radius: 10rpx;
 			margin-top: 20rpx;
 			position: relative;
@@ -456,7 +435,7 @@
 		}
 		.advertisement_wrap2 {
 			width: 646rpx;
-			// height: 266rpx;
+			height: 266rpx;
 			border-radius: 10rpx;
 			margin: 28rpx auto;
 			position: relative;
@@ -513,7 +492,7 @@
 				font-family: PingFang SC;
 				font-weight: 400;
 				color: #666666;
-				// text-align: center;
+				text-align: center;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -621,46 +600,51 @@
 
 				.words_text {
 					width: 100%;
-					max-height: 80rpx;
+					height: 80rpx;
 					line-height: 40rpx;
 					font-size: 30rpx;
 					font-family: PingFang SC;
 					font-weight: 400;
 					color: #333333;
-					// margin: 20rpx 0;
-					margin-top: 20rpx;
-					// overflow: hidden;
+					margin: 20rpx 0;
+					overflow: hidden;
 					position: relative;
-					text{
+
+					.detailed_text {
+						width: 98rpx;
+						height: 40rpx;
+						line-height: 40rpx;
+						text-align: center;
 						font-size: 30rpx;
 						color: #0099FF;
+						position: absolute;
+						bottom: 0;
+						right: 0;
+						background-color: #fff;
+
+						.detailed_icon {
+							font-size: 12rpx;
+						}
 					}
 				}
 
 				.img_list {
 					width: 100%;
 					height: 156rpx;
-					flex-wrap: wrap;
-					margin-top: 20rpx;
-					.img_li{
-						width: 25%;
-						padding: 6rpx;
-						height: 162rpx;
-						image {
-							width: 100%;
-							height: 100%;
-						
-							// &:nth-last-child() {
-							// 	margin-right: 0;
-							// }
-						}
+
+					image {
+						width: 156rpx;
+						height: 156rpx;
+						margin-right: 6rpx;
+
+						// &:nth-last-child() {
+						// 	margin-right: 0;
+						// }
 					}
-					
 				}
 				.list_botm{
 					width: 100%;
-					padding: 20rpx 0;
-					// height: 78rpx;
+					height: 78rpx;
 					font-size: 26rpx;
 					font-family: PingFang SC;
 					font-weight: 400;
@@ -676,15 +660,6 @@
 						font-weight: 400;
 						color: #FF6600;
 						opacity: .8;
-					}
-					.add_box{
-						width: 400rpx;
-						font-size: 26rpx;
-						font-family: PingFang SC;
-						font-weight: 400;
-						color: #666666;
-						line-height: 36rpx;
-						height: 36rpx;
 					}
 				}
 				

@@ -3,7 +3,7 @@
 		
 		<view class="my_tabbar_box"></view>
 		<view class="my_tabbar dis_flex ais">
-			<view class="my_tabbar_li" v-for="(item,index) in tab_list" @click="go_url(item)">
+			<view class="my_tabbar_li" v-for="(item,index) in tab_list" @click="go_url(item)" :key="index">
 				<block  v-if="item.is_link==2&&item.applet_url==pageurl||item.is_link==1&&item.web_url==weburl">
 					<image :src="$service.getimg(item.select_icon)" mode="aspectFit"></image>
 					<text class="active">{{item.title}}</text>
@@ -26,7 +26,6 @@
 	export default {
 		name:"tab-list",
 		props: {
-			
 			pageurl:{ type:String, default: null },
 			weburl:{ type:String, default: null },
 		},
@@ -36,16 +35,16 @@
 			};
 		},
 		computed: {
-		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list']),
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list']),
 		},
 		methods: {
 			go_url(item){
 				if(item.is_link==2){
-					uni.navigateTo({
+					uni.redirectTo({
 						url:item.applet_url
 					})
 				}else{
-					var web_url=JSON.stringify(item.web_url)
+					var web_url=item.web_url
 					if(item.applet_ur){
 						uni.navigateTo({
 							url:item.applet_url+'?weburl='+web_url
@@ -55,7 +54,6 @@
 							url:'/pages/follow/follow?title='+item.title+'&weburl='+web_url
 						})
 					}
-					
 				}
 				
 			}

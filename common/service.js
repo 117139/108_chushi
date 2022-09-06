@@ -580,7 +580,7 @@ const wx_upload = function(tximg,type) {
 		})
 		// #ifndef H5
 		console.log(tximg)
-		var jkurl='/publics/img'
+		var jkurl='/login/img_upload'
 		// if(type==1){
 		// 	jkurl='Sign/video'
 		// }
@@ -651,7 +651,7 @@ const wx_upload = function(tximg,type) {
 							base64_img:base64,
 							// type:1,
 						}
-						var jkurl='/publics/base'
+						var jkurl='/login/uploadFilesImg'
 						// if(type==1){
 						// 	jkurl='Sign/video'
 						// }
@@ -2068,6 +2068,29 @@ const LNum=function(txt,num) {
 	}
 	return str
 }
+const getKm=function(num) {
+	
+	if(!num){
+		return "0m"
+	}
+	
+	if(1000>num){
+		
+		num = num.toFixed(2)
+		num=num+'m'
+	}else{
+		num=num/1000
+		
+		if(num>100){
+			num = num.toFixed(0)
+		}else{
+			num = num.toFixed(2)
+		}
+		num=num+'km'
+	}
+	return num
+}
+
 export default {
 	getUsers,
 	addUser,
@@ -2103,5 +2126,6 @@ export default {
 	appVN,
 	set_num,
 	LNum,
-	limit
+	limit,
+	getKm
 }

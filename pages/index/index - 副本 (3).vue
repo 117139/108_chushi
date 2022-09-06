@@ -44,8 +44,8 @@
 					{{item.title}}
 				</view>
 			</view>
-			<block  v-for="(item,index) in datas" :key="index">
-			<view class="list_box"  @click="$service.jump" :data-url="'/pages/orderDetails/orderDetails?id='+item.id">
+
+			<view class="list_box" v-for="(item,index) in datas" :key="index"  @tap="$sevice.jump" :data-url="'/pages/orderDetails/orderDetails?id='+item.id">
 				<view class="list_header flex_bet">
 					<view class="list_header_l flex_ali">
 						<image v-if="item.user" :src="$service.getimg(item.user.img)" mode="aspectFill"></image>
@@ -54,7 +54,7 @@
 								{{item.user.nick}}
 							</view>
 							<view class="list_header_time">
-								{{item.update_time}}
+								{{item.create_time}}
 							</view>
 						</view>
 					</view>
@@ -63,7 +63,7 @@
 					</view>
 				</view>
 				<view class="words_text oh2">
-					{{$service.LNum(item.content,35)}}
+					{{item.content}}
 					<text class="detailed_text ">
 						详情
 					</text>
@@ -71,8 +71,8 @@
 				</view>
 
 				<view v-if="item.img_arr.length>0" class="img_list flex">
-					<view class="img_li" v-for="(item1,index2) in item.img_arr" :key="index2">
-						<image lazy-load="true" :src="$service.getimg(item1)" mode="aspectFill"></image>
+					<view class="img_li" v-for="(item,index2) in item.img_arr" :key="index2">
+						<image :src="$service.getimg(item)" mode="aspectFill"></image>
 					</view>
 				</view>
 				<view class="list_botm flex_bet">
@@ -87,15 +87,13 @@
 					</view>
 				</view>
 				
-				
+				<!-- #ifdef MP-WEIXIN -->
+				<view class="advertisement_wrap area2" v-if="index>0 && index%banner_interval==0	">
+					<!-- <ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad> -->
+				</view>
+				<!-- #endif -->
 				
 			</view>
-			<!-- #ifdef MP-WEIXIN -->
-			<view class="advertisement_wrap2" v-if="index>0 && index%banner_interval==0	">
-				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
-			</view>
-			<!-- #endif -->
-			</block>
 			<!-- <view class="advertisement_wrap2">
 				<image :src="imgUrl2" mode="aspectFill"></image>
 				<view class="advertisement_text">
@@ -426,7 +424,7 @@
 		}
 
 		.advertisement_wrap {
-			// height: 286rpx;
+			height: 286rpx;
 			border-radius: 10rpx;
 			margin-top: 20rpx;
 			position: relative;
@@ -456,7 +454,7 @@
 		}
 		.advertisement_wrap2 {
 			width: 646rpx;
-			// height: 266rpx;
+			height: 266rpx;
 			border-radius: 10rpx;
 			margin: 28rpx auto;
 			position: relative;

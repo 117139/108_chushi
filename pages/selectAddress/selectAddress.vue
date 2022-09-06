@@ -4,9 +4,9 @@
 		<view class="header_tit">
 			当前位置
 		</view>
-		<view class="location_address flex_bet">
+		<view class="location_address flex_bet" @tap="chooseLocation">
 			<view class="address_word">
-				{{address}}
+				{{address?address.address:'请选择地址'}}
 			</view>
 			<view class="location_r flex_ali">
 				<view class="icon icon-dizhi address_icon"></view>
@@ -15,7 +15,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="sele_address flex_bet">
+		<!-- <view class="sele_address flex_bet">
 			<view class="flex_ali">
 				<view class="address_sele">
 					选择地址
@@ -25,9 +25,9 @@
 				</view>
 			</view>
 			<view class="icon icon-youjiantou icon_r"></view>
-		</view>
+		</view> -->
 		
-		<view class="btn_bottom area2">
+		<view class="btn_bottom area2" @tap="back">
 			确定
 		</view>
 	</view>
@@ -46,11 +46,38 @@
 		},
 		methods: {
 			getCate() { //判断显示静态页 还是 数据页
-				if (this.$sjuNav.appVn == 0) {
+				if (this.$service.appVN == 0) {
 					this.address = "北京市东城区王府井大街105号王府井大街105号"
 					this.seleAddress="北京市-东城区"
 					return
 				}
+			},
+			chooseLocation(e) {//重新定位
+				console.log(e);
+				uni.chooseLocation({
+				// uni.choosePoi({
+					success: res => {
+						
+						// uni.getLocation({
+						// 	type: 'gcj02',
+						// 	altitude: true,
+						// 	geocode: true,
+						// 	success: function(res) {
+						// 		console.log(res.longitude);
+						// 		console.log(res.latitude);
+						// 	}
+						// })
+						console.log(res)
+						// this.address = res.name
+						this.address = res
+						that.$store.commit('set_my_address',res)
+					}
+				})
+			},
+			back(){//确定
+				uni.navigateBack({
+					delta:1
+				})
 			},
 		}
 	}
@@ -78,7 +105,7 @@
 			background: #FFFFFF;
 			padding: 0 28rpx;
 			.address_word{
-				width: 420rpx;
+				width: 500rpx;
 				height: 100%;
 				font-size: 28rpx;
 				font-family: PingFang SC;

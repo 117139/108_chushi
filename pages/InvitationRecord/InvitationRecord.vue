@@ -1,7 +1,7 @@
 <template>
 	<view class="InvitationRecord bottom-of-page">
 		<!-- 邀请记录 -->
-		<view class="rule_text area2" v-html="ruleText"></view>
+		<view v-if="basedata.statement_3" class="rule_text area2" v-html="basedata.statement_3"></view>
 
 		<view class=" flex_aro">
 			<view class="settlement_btn" @click="$service.jump" data-url="/pages/status/status">
@@ -41,7 +41,7 @@
 		</view>
 
 		<view class="botm_btn flex_aro">
-			<view class="btn_one">
+			<view class="btn_one" @tap="promptly">
 				立即邀请
 			</view>
 			<view class="btn_two" @tap="codeClick">
@@ -55,15 +55,21 @@
 				<view class="keep_img">
 					保存图片，分享到厨师群
 				</view>
-			</view>
-			<view class="cut_out">
-				x
+				<view class="cut_out" @tap="codeClick">
+					x
+				</view>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
@@ -118,6 +124,10 @@
 
 			}
 		},
+		
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+		},
 		onLoad() {
 			this.getCate()
 		},
@@ -147,6 +157,12 @@
 			codeClick() { //生成二维码
 				this.isShow = !this.isShow
 			},
+			promptly(){//立即邀请
+				uni.showToast({
+					title:"邀请链接已复制",
+					icon:"none"
+				})
+			},
 		}
 	}
 </script>
@@ -158,7 +174,7 @@
 		min-height: 100vh;
 		padding-bottom: 120rpx;
 		position: relative;
-
+		padding-top: 24rpx;
 		.rule_text {
 			min-height: 110rpx;
 			background: #BBBBBB;
@@ -170,7 +186,7 @@
 			font-weight: 400;
 			color: #FFFFFF;
 			line-height: 32rpx;
-			padding: 24rpx;
+			padding:0 24rpx 24rpx;
 		}
 
 		.settlement_btn {
@@ -360,8 +376,9 @@
 				border-radius: 50%;
 				border: 1px solid #ffffff;
 				position: absolute;
-				bottom: 40rpx;
+				bottom: -76rpx;
 				left: 50%;
+				transform: translate(-50%,0);
 			}
 		}
 	}

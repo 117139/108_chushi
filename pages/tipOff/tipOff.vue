@@ -9,7 +9,7 @@
 				举报原因<text>*</text>
 			</view>
 			<textarea class="textarea_uni" id="" placeholder="请填写您举报的原因（字数200字以内）"
-				placeholder-style="font-size: 28rpx;color: #DDDDDD;" maxlength="200" auto-height></textarea>
+				placeholder-style="font-size: 28rpx;color: #DDDDDD;" maxlength="200" auto-height v-model="content"></textarea>
 		</view>
 		
 		<view class="voucher_wrap">
@@ -17,18 +17,21 @@
 				相关凭证 
 			</view>
 			<view class="upload_wrap flex">
-				<view class="upload_img_box" v-for="(item,index) in uploadImg" :key="index">
-					<image class="upload_img" :src="item" mode="aspectFill"></image>
-					<view class="cut_out" @tap="cutOut(index)">
+				<!-- <view class="upload_img_box" v-for="(item,index) in uploadImg" :key="index"> -->
+				<view class="upload_img_box" v-for="(item,index) in img_arr" :key="index">
+					<image class="upload_img" :src="$service.getimg(item)" mode="aspectFill"></image>
+					<!-- <view class="cut_out" @tap="cutOut(index)"> -->
+					<view class="cut_out" @click="delimg_fuc"  data-type="0" :data-idx="index" data-idx1="1">
 						x
 					</view>
 				</view>
-				<view class="no_img" @tap="uploadTo">
+				<!-- <view class="no_img" @tap="uploadTo"> -->
+				<view class="no_img"  @click="upimg_fuc" data-type="0"  data-idx1="1">
 					+
 				</view>
 			</view>
 		</view>
-		<view class="submit_btn area2">
+		<view class="submit_btn area2" @click="sub_fuc">
 			提交
 		</view>
 
@@ -36,16 +39,210 @@
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
 				uploadImg: [], //上传
+				content:'',
+				img_arr:[],
+				options:''
 			}
 		},
-		onLoad() {
-			this.getCate()
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+		},
+		onLoad(e) {
+			that=this
+			that.options=e
 		},
 		methods: {
+			sub_fuc(){
+				
+				if(!that.content){
+					uni.showToast({
+						icon: 'none',
+						title: '请输入发布信息'
+					})
+					return
+				}
+				
+				var img_arr= that.img_arr.join(',')
+				var jkurl='/index/report'
+				var datas={
+					pid:that.options.id||'',
+					title:that.content,
+					img_arr:img_arr,
+					
+				}
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						uni.showToast({
+							icon: 'none',
+							title: '提交成功'
+						})
+						setTimeout(function(){
+							uni.navigateBack()
+						},1000)
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
+			
+			upimg_fuc(e){
+				uni.showActionSheet({
+					itemList: ['拍照', '相册选择'],
+					success: function(res) {
+						console.log('选中了第' + (res.tapIndex + 1) + '个按钮');
+						var sourceType = ['camera', 'album']
+						if (res.tapIndex == 0) {
+							sourceType = ['camera']
+						} else {
+							sourceType = ['album']
+						}
+						// var len=that.img_arr
+						uni.chooseImage({
+							count: 9,
+							sizeType: ['original', 'compressed'],
+							sourceType: sourceType,
+							success: function(res) {
+								console.log(res)
+								const tempFilePaths = res.tempFilePaths
+								
+								// const imglen = that.img_list.length
+								
+								that.upimg(tempFilePaths, 0,e)
+								
+							}
+						});
+					},
+					fail: function(res) {
+						console.log(res.errMsg);
+					}
+				});
+			},
+			upimg(imgs, i,e) {
+			  
+				var edatas=e.currentTarget.dataset
+				
+				that.$service.wx_upload(imgs[i]).then(res => {
+							
+					that.btn_kg = 0
+					console.log(res)
+					if (res.code == 1) {
+						var datas = res.data
+						console.log(i)
+						that.img_arr.push(datas)
+						if ( i<imgs.length-1) {
+						  i++
+						  that.upimg(imgs, i,e)
+						}else{
+							// that.sethd()
+						}
+						// if(type==1){
+						// 	// that.member_avatar=datas
+						// }else{
+						// 	var newdata = that.img_list
+						// 	// var new_img={
+						// 	// 	url:datas,
+						// 	// 	title:''
+						// 	// }
+						// 	newdata.push(datas)
+							
+						// 	that.img_list= newdata
+						// 	var news1 = that.img_list.length
+						// 	if (news1 < 9&& i<imgs.length-1) {
+						// 	  i++
+						// 	  that.upimg(imgs, i,type)
+						// 	}
+						// }
+						
+					} else {
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: "none",
+								title: "上传失败"
+							})
+						}
+					}
+				}).catch(e => {
+					that.btn_kg = 0
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '操作失败'
+					})
+				})
+				
+			},
+			delimg_fuc(e){
+				console.log(e.currentTarget.dataset.idx)
+				var datas=e.currentTarget.dataset
+				wx.showModal({
+					title: '提示',
+					content: '确定要删除这张图片吗',
+					success (res) {
+						if (res.confirm) {
+							console.log('用户点击确定')
+							if(datas.idx1==1){
+								that.img_arr.splice(datas.idx,1)
+							}else{
+								that.datas.img2_arr.splice(datas.idx,1)
+							}
+							// that.sethd()
+							// that.img_list=that.img_list
+						} else if (res.cancel) {
+							console.log('用户点击取消')
+						}
+					}
+				})
+			},
+			
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 

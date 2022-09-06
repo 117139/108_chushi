@@ -1,7 +1,7 @@
 {
-    "name" : "03_cookRecruit",
+    "name" : "招厨师群",
     "appid" : "__UNI__DB46813",
-    "description" : "",
+    "description" : "招厨师群",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -55,7 +55,12 @@
             "urlCheck" : false,
             "minified" : true
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "获取用户地理位置信息"
+            }
+        }
     },
     "mp-alipay" : {
         "usingComponents" : true
@@ -69,5 +74,24 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2"
+    "vueVersion" : "2",
+    "h5" : {
+        "sdkConfigs" : {
+            "maps" : {
+                "qqmap" : {
+                    "key" : "LVXBZ-UMECX-7ZH4P-TCKL6-WTTU2-KOB7Z"
+                }
+            }
+        },
+        "template" : "index.html",
+        "title" : "招厨师群",
+        "router" : {
+            "mode" : "hash"
+        },
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : true
+            }
+        }
+    }
 }

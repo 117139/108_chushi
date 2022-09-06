@@ -15,7 +15,6 @@ const store = new Vuex.Store({
 		
 		
 		cityList:'',
-		basedata:'',
 		
 		
 		
@@ -31,9 +30,14 @@ const store = new Vuex.Store({
 		Storedatas:'', //店长信息
 		
 		
-		tab_list:[]
+		basedata:'',
+		tab_list:[],
+		my_address:'', //地址信息
 	},
 	mutations: {
+		set_my_address(state, my_address) {
+			state.my_address = my_address||[]
+		},
 		set_tab_list(state, tab_list) {
 			state.tab_list = tab_list||[]
 		},

@@ -21,6 +21,11 @@
 					that.getbasedata()
 					that.$service.wxlogin('token')
 			})
+			uni.$on('getbasedata', (data) => {
+					console.log('标题：' + data.title)
+					console.log('内容：' + data.content)
+						that.getbasedata()
+			})
 			uni.getSystemInfo({
 				success: function(e) {
 					that.$store.commit('setplatform', e.platform)
@@ -103,7 +108,7 @@
 			},
 			getbasedata(){
 				var datas={}
-				var jkurl='/login/weizhi'
+				var jkurl='/index/system'
 				
 				that.$service.P_get(jkurl, datas).then(res => {
 					that.btnkg = 0
@@ -398,5 +403,12 @@
 				}
 			}
 		}
+	}
+	.data_null{
+		width: 100%;
+		height: 150rpx;
+		color: #666;
+		text-align: center;
+		font-size: 32rpx;
 	}
 </style>

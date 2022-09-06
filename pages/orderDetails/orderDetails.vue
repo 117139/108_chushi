@@ -1,71 +1,92 @@
 <template>
-	<view class="orderDetails bottom-of-page">
-		<!-- 订单 的 详情 -->
-		<view class="list_header area2 flex_bet">
-			<view class="list_header_l flex_ali">
-				<image :src="userImg" mode="aspectFill"></image>
-				<view class="list_header_text">
+	<view class="">
+		<view v-if="datas" class="orderDetails bottom-of-page">
+			<!-- 订单 的 详情 -->
+			<view class="list_header area2 flex_bet">
+				<view v-if="datas.user" class="list_header_l flex_ali">
+					<image :src="$service.getimg(datas.user.img)" mode="aspectFill"></image>
+					<view class="list_header_text">
+						<view class="">
+							{{datas.user.nick}}
+						</view>
+						<view class="list_header_time">
+							{{datas.update_time}}
+						</view>
+					</view>
+				</view>
+				<view class="istop" v-if="datas.is_top==1">
+					置顶
+				</view>
+			</view>
+			<view class="two_line area flex_bet">
+				<view class=" flex_ali">
+					<text class="icon icon-dizhi address_icon"></text>
+					<view class="add_box oh1">
+						{{datas.address}}
+					</view>
+				</view>
+				<view class="range_num">
+					距离{{$service.getKm(datas.distance)}}
+				</view>
+			</view>
+
+			<view class="content_text area">{{datas.content}}</view>
+			<view class="img_wrap flex">
+				<image :src="$service.getimg(item)" mode="aspectFill" v-for="(item,index) in datas.img_arr" :key="index" @tap="imgClick(item,index)" lazy-load="true"></image>
+			</view>
+
+			<view class="report_text flex_ali" @tap="$service.jump" :data-url="'/pages/tipOff/tipOff?id='+options.id">
+				<text class="icon icon-jubao2"></text>
+				<view>举报</view>
+			</view>
+			<!-- #ifdef MP-WEIXIN -->
+			<view class="advertisement_wrap area2">
+				<!-- <image :src="imgUrl2" mode="aspectFill"></image>
+				<view class="advertisement_text">
+					广告
+				</view> -->
+				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
+			</view>
+			<!-- #endif -->
+			<view class="botm_btn bottom-button flex_aro">
+				<!-- #ifdef MP-WEIXIN -->
+				<view class="share_wrap flex_cen">
+					<button open-type="share" class="share_wrap_btn"></button>
+					<text class="icon icon-fenxiang"></text>
 					<view class="">
-						{{userName}}
-					</view>
-					<view class="list_header_time">
-						{{time}}
+						分享好友
 					</view>
 				</view>
-			</view>
-			<view class="istop">
-				置顶
-			</view>
-		</view>
-		<view class="two_line area flex_bet">
-			<view class=" flex_ali">
-				<text class="icon icon-dizhi address_icon"></text>
-				<view class="">
-					{{address}}
+				<!-- #endif -->
+				<!-- #ifdef H5 -->
+				<view class="share_wrap flex_cen">
+					<text class="icon icon-fenxiang"></text>
+					<view class="">
+						分享好友
+					</view>
+				</view>
+				<!-- #endif -->
+				<!-- <view class="dial_wrap flex_cen" @tap="$service.call" :data-tel="datas.phone"> -->
+				<view class="dial_wrap flex_cen" @tap="call" :data-tel="datas.phone">
+					<text class="icon icon-dianhua"></text>
+					<view class="">
+						拨打电话
+					</view>
 				</view>
 			</view>
-			<view class="range_num">
-				距离{{rangeNum}}km
-			</view>
-		</view>
 
-		<view class="content_text area" v-html="contentText"></view>
-		<view class="img_wrap flex">
-			<image :src="item" mode="aspectFill" v-for="(item,index) in imgUrl" :key="index"></image>
+			<!-- <popUp :isShow="isShow" v-model="isShow"></popUp> -->
 		</view>
-
-		<view class="report_text flex_ali" @tap="$sjuNav.navTo(`/pages/tipOff/tipOff`)">
-			<text class="icon icon-jubao2"></text>
-			<view>举报</view>
-		</view>
-
-		<view class="advertisement_wrap area2">
-			<image :src="imgUrl2" mode="aspectFill"></image>
-			<view class="advertisement_text">
-				广告
-			</view>
-		</view>
-
-		<view class="botm_btn flex_aro">
-			<view class="share_wrap flex_cen">
-				<text class="icon icon-fenxiang"></text>
-				<view class="">
-					分享好友
-				</view>
-			</view>
-			<view class="dial_wrap flex_cen" @tap="call(phone)">
-				<text class="icon icon-dianhua"></text>
-				<view class="">
-					拨打电话
-				</view>
-			</view>
-		</view>
-
-		<popUp :isShow="isShow" v-model="isShow"></popUp>
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that = null
 	export default {
 		data() {
 			return {
@@ -79,12 +100,71 @@
 				imgUrl2: "", //广告图片
 				phone: '12345678901',
 				isShow: true, //弹窗广告
+				
+				options:'',
+				datas:''
 			}
 		},
-		onLoad() {
-			this.getCate()
+		computed: {
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+		},
+		onLoad(e) {
+			that=this
+			that.options=e
+			
+		},
+		onShow() {
+			this.getdatas()
 		},
 		methods: {
+			
+			getdatas(){
+				var jkurl='/index/detail'
+				var datas={
+					id:that.options.id
+				}
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						that.datas=datas
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 					this.userImg = "/static/images/tx.jpg"
@@ -109,22 +189,80 @@
 				}
 			},
 			call(e) { //打电话
+				var tiptext='本次拨打扣除'+that.basedata.phone_point+'积分'
+				if(that.datas.show_phone==1){
+					tiptext='是否拨打' + that.datas.phone + '?'
+				}
 				uni.showModal({
-					// title: '本次拨打扣除10积分',
-					content: '本次拨打扣除10积分',
+					content: tiptext,
 					success: function(res) {
 						if (res.confirm) {
 							console.log('用户点击确定');
-							uni.makePhoneCall({
-								phoneNumber: e
-							});
+							if(that.datas.show_phone==1){
+								uni.makePhoneCall({
+									phoneNumber: that.datas.phone
+								});
+							}
+							var jkurl='/index/call_phone'
+							var datas={
+								id:that.options.id
+							}
+							var header={
+								'content-type': 'application/json',
+							}
+							that.$service.P_post(jkurl, datas,header).then(res => {
+								that.btnkg = 0
+								console.log(res)
+								if (res.code == 1) {
+									that.htmlReset = 0
+									var datas = res.data
+									console.log(typeof datas)
+							
+									if (typeof datas == 'string') {
+										datas = JSON.parse(datas)
+									}
+									console.log(res)
+									
+									uni.makePhoneCall({
+										phoneNumber: e
+									});
+								} else {
+								
+									if (res.msg) {
+										uni.showToast({
+											icon: 'none',
+											title: res.msg
+										})
+									} else {
+										uni.showToast({
+											icon: 'none',
+											title: '获取数据失败'
+										})
+									}
+								}
+							}).catch(e => {
+								that.htmlReset = 1
+								that.btnkg = 0
+								// that.$refs.htmlLoading.htmlReset_fuc(1)
+								console.log(e)
+								uni.showToast({
+									icon: 'none',
+									title: '获取数据失败，请检查您的网络连接'
+								})
+							})
+							
 						} else if (res.cancel) {
 							console.log('用户点击取消');
 						}
 					}
 				})
-
-			}
+			},
+			imgClick(item,index){//图片预览
+				uni.previewImage({
+					current:index,
+					urls:that.$service.getimgarr(that.datas.img_arr,'arr')
+				})
+			},
 		}
 	}
 </script>
@@ -135,8 +273,6 @@
 		height: 100%;
 		min-height: 100vh;
 		background-color: #ffffff;
-		padding-bottom: 50rpx;
-		position: relative;
 
 		.list_header {
 			height: auto;
@@ -193,13 +329,21 @@
 			color: #666666;
 			border-bottom: 1px solid #EEEEEE;
 			padding-bottom: 26rpx;
-
+			margin-top: 10rpx;
 			.address_icon {
 				font-size: 28rpx;
 				color: #DDDDDD;
 				margin-right: 10rpx;
 			}
-
+			.add_box{
+				width: 400rpx;
+				font-size: 26rpx;
+				font-family: PingFang SC;
+				font-weight: 400;
+				color: #666666;
+				line-height: 36rpx;
+				height: 36rpx;
+			}
 			.range_num {
 				font-size: 26rpx;
 				font-family: PingFang SC;
@@ -285,25 +429,33 @@
 			line-height: 80rpx;
 			background: #FF6000;
 			border-radius: 10rpx;
-			margin-top: 52rpx;
+			// margin-top: 52rpx;
 			font-size: 30rpx;
 			font-family: PingFang SC;
 			font-weight: 400;
 			color: #FFFFFF;
-
+			position: relative;
 			text {
 				font-size: 40rpx;
 				margin-right: 12rpx;
 			}
 		}
-
+		.share_wrap_btn{
+			position: absolute;
+			opacity: 0;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 100;
+		}
 		.dial_wrap {
 			width: 338rpx;
 			height: 80rpx;
 			line-height: 80rpx;
 			background: #ED4149;
 			border-radius: 10rpx;
-			margin-top: 52rpx;
+			// margin-top: 52rpx;
 			font-size: 30rpx;
 			font-family: PingFang SC;
 			font-weight: 400;
@@ -322,6 +474,7 @@
 			position: fixed;
 			bottom: 0;
 			left: 0;
+			padding: 10rpx 0;
 		}
 	}
 </style>

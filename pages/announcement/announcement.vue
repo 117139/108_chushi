@@ -1,12 +1,15 @@
 <template>
 	<view class="announcement">
 		<!-- 平台公告 -->
-		<view class="list_content area2" v-for="(item,index) in list" :key="index" @tap="$sjuNav.navTo(`/pages/details/details`)">
+		<view v-if="datas.length==0" class="data_null">
+			暂无数据
+		</view>
+		<view class="list_content area2" v-for="(item,index) in datas" :key="index" @tap="$service.jump" :data-url="'/pages/details/details?id='+item.id">
 			<view class="list_text">
-				{{item.text}}
+				{{item.title}}
 			</view>
 			<view class="list_time">
-				{{item.time}}
+				{{item.create_time}}
 			</view>
 		</view>
 		
@@ -14,16 +17,96 @@
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
-				list:[],
+				datas:[],
+				page:1
 			}
 		},
 		onLoad() {
-			this.getCate()
+			that=this
+			this.onRetry()
+		},
+		onReachBottom() {
+			that.getdatas()
 		},
 		methods: {
+			onRetry(){
+				that.page=1
+				that.datas=[]
+				that.getdatas()
+				
+			},
+			
+			getdatas(){
+				// return
+				uni.showLoading({
+						mask:true,
+						title:'正在获取数据'
+				})
+				var jkurl='/index/notice'
+				var datas={
+					page:that.page,
+				}
+				var nowpage=that.page
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						if(nowpage==1){
+							that.datas=datas.data
+						}else{
+							that.datas=that.datas.concat(datas.data)
+						}
+						if(datas.data.length==0){
+							return
+						}
+						that.page++
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
+			
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 					this.list=[
