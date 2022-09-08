@@ -139,7 +139,16 @@
 				"enablePullDownRefresh": false
 			}
 
-		}]
+		}    ,{
+                    "path" : "fabu_edit/fabu_edit",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "编辑",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
+            ]
 	}],
 	// "tabBar": {
 	// 	"color": "#BBBBBB",

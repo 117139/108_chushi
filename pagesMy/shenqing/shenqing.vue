@@ -125,6 +125,65 @@
 					icon: 'none',
 					title: '提交成功'
 				})
+				
+				var address=that.region.join('')
+				var jkurl='/mine/m_money'
+				var datas={
+					name:that.m_name,
+					address:address,
+					phone:that.m_tel,
+					wx_code:that.m_wx,
+				}
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						uni.showToast({
+							icon: 'none',
+							title: '提交成功'
+						})
+						setTimeout(function(){
+							// uni.redirectTo({
+							// 	url:'/pages/index/index'
+							// })
+							uni.navigateBack()
+						},1000)
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
 			},
 			//选择地区
 			bindRegionChange(e) {

@@ -24,9 +24,9 @@
 					</view>
 				</view>
 				<view class="content_card area2">
-					<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/myIntegral/myIntegral`)">
+					<view class="card_each border_botm flex_bet" @tap="$service.jump" data-url="/pages/myIntegral/myIntegral" :data-login="true">
 						<view class=" flex_ali">
-							<image class="img" src="@/static/images/wdjf.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/wdjf.png" mode="aspectFit"></image>
 							<view class="">
 								我的积分
 							</view>
@@ -38,9 +38,9 @@
 							<view class="icon icon-youjiantou icon_r"></view>
 						</view>
 					</view>
-					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/myRelease/myRelease`)">
+					<view class="card_each flex_bet" @tap="$service.jump" data-url="/pages/myRelease/myRelease" :data-login="true">
 						<view class=" flex_ali">
-							<image class="img2" src="@/static/images/wdfb.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/wdfb.png" mode="aspectFit"></image>
 							<view class="">
 								我的发布
 							</view>
@@ -50,9 +50,9 @@
 				</view>
 				
 				<view class="content_card area2">
-					<view class="card_each border_botm flex_bet" @tap="$sjuNav.navTo(`/pages/makeMoney/makeMoney`)">
+					<view v-if="basedata.is_zuanqian==1" class="card_each  flex_bet" @tap="$service.jump" data-url="/pages/makeMoney/makeMoney" :data-login="true">
 						<view class=" flex_ali">
-							<image class="img5" src="@/static/images/wyzq.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/wyzq.png" mode="aspectFit"></image>
 							<view class="">
 								我要赚钱
 							</view>
@@ -61,9 +61,9 @@
 							<view class="icon icon-youjiantou icon_r"></view>
 						</view>
 					</view>
-					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/InvitationRecord/InvitationRecord`)">
+					<view v-if="basedata.is_yaoqing==1&&loginDatas.invi==1" class="card_each flex_bet" @tap="$service.jump" data-url="/pages/InvitationRecord/InvitationRecord" :data-login="true">
 						<view class=" flex_ali">
-							<image class="img6" src="@/static/images/yqjl.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/yqjl.png" mode="aspectFit"></image>
 							<view class="">
 								邀请记录
 							</view>
@@ -73,20 +73,20 @@
 				</view>
 		
 				<view class="content_card area2">
-					<view class="card_each border_botm flex_bet" @tap="call(phone)">
+					<view class="card_each border_botm flex_bet" @tap="call(basedata.phone)">
 						<view class=" flex_ali">
-							<image class="img3" src="@/static/images/lxkf.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/lxkf.png" mode="aspectFit"></image>
 							<view class="">
 								联系客服
 							</view>
 						</view>
 						<view class="phone_num">
-							{{phone}}
+							{{basedata.phone||''}}
 						</view>
 					</view>
 					<view class="card_each flex_bet" @tap="$sjuNav.navTo(`/pages/aboutMy/aboutMy`)">
 						<view class=" flex_ali">
-							<image class="img4" src="@/static/images/gywm.png" mode="aspectFit"></image>
+							<image class="li_img" src="@/static/images/gywm.png" mode="aspectFit"></image>
 							<view class="">
 								关于我们
 							</view>
@@ -112,7 +112,7 @@
 		data() {
 			return {
 				userImg: '', //用户头像
-				userName: '', //用户名
+				// userName: '', //用户名
 				integral: "", //我的积分
 				phone: "", //联系客服
 				isShow: true, //弹窗广告
@@ -122,7 +122,11 @@
 		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','loginDatas','basedata']),
 		},
 		onLoad() {
-			this.getCate()
+			// this.getCate()
+			uni.$emit('login_fuc', {
+				title: ' 刷新信息 ',
+				content: 'item.id'
+			});
 		},
 		methods: {
 			getCate() { //判断显示静态页 还是 数据页
@@ -135,8 +139,11 @@
 				}
 			},
 			call(e){
+				if(!e){
+					return
+				}
 				uni.makePhoneCall({
-					phoneNumber: e
+					phoneNumber: e+''
 				});
 			}
 		}
@@ -191,47 +198,49 @@
 			}
 
 			.content_card {
-				height: 200rpx;
+				// height: 200rpx;
 				background: #FFFFFF;
 				border-radius: 10rpx;
 				margin-top: 20rpx;
-
+				
 				.card_each {
 					width: 100%;
 					height: 100rpx;
 					padding: 0 24rpx;
-
-					.img {
+					&+.card_each{
+						border-top: 1px solid #EEEEEE;
+					}
+					.li_img {
 						width: 36rpx;
 						height: 36rpx;
 						margin-right: 22rpx;
 					}
 
-					.img2 {
-						width: 30rpx;
-						height: 34rpx;
-						margin-right: 26rpx;
-					}
-					.img3{
-						width: 32rpx;
-						height: 34rpx;
-						margin-right: 24rpx;
-					}
-					.img4{
-						width: 38rpx;
-						height: 38rpx;
-						margin-right: 20rpx;
-					}
-					.img5{
-						width: 38rpx;
-						height: 38rpx;
-						margin-right: 20rpx;
-					}
-					.img6{
-						width: 34rpx;
-						height: 36rpx;
-						margin-right: 20rpx;
-					}
+					// .img2 {
+					// 	width: 30rpx;
+					// 	height: 34rpx;
+					// 	margin-right: 26rpx;
+					// }
+					// .img3{
+					// 	width: 32rpx;
+					// 	height: 34rpx;
+					// 	margin-right: 24rpx;
+					// }
+					// .img4{
+					// 	width: 38rpx;
+					// 	height: 38rpx;
+					// 	margin-right: 20rpx;
+					// }
+					// .img5{
+					// 	width: 38rpx;
+					// 	height: 38rpx;
+					// 	margin-right: 20rpx;
+					// }
+					// .img6{
+					// 	width: 34rpx;
+					// 	height: 36rpx;
+					// 	margin-right: 20rpx;
+					// }
 				}
 
 				.integral_num {
@@ -257,7 +266,7 @@
 		}
 
 		.border_botm {
-			border-bottom: 1px solid #EEEEEE;
+			// border-bottom: 1px solid #EEEEEE;
 		}
 	}
 </style>

@@ -1,12 +1,15 @@
 <template>
 	<view class="wrap_box">
 		<!-- <uParse v-if="datas" :content="datas"></uParse> -->
+		<view class="data_null" v-if="datas.length==0">
+			暂无数据
+		</view>
 		<view class="js_li" v-for="(item,index) in datas">
 			<view class="js_li_tit">
-				邀请50人已结算
+				{{item.title}}
 			</view>
 			<view class="js_li_time">
-				2022-03-10  13:28:56
+				{{item.create_time}}
 			</view>
 		</view>
 		
@@ -37,66 +40,84 @@
 			that.options=e||{}
 			console.log(e)
 			
-			that.getdata()
+			that.onRetry()
 		},
 		onShow() {
 			
 		},
+		onReachBottom() {
+			that.getdatas()
+		},
 		methods: {
 			// ...mapMutations(['wxshouquan','login']),
 			test(){},
-			getdata(){
-				if(that.$service.appVN==0){
-					that.datas=[1,1,1,1,1,1,1,1]
-					return
-				}
+			onRetry(){
+				that.page=1
+				that.datas=[]
+				that.getdatas()
+				
+			},
+			
+			getdatas(){
+				// return
+				uni.showLoading({
+						mask:true,
+						title:'正在获取数据'
+				})
+				var jkurl='/mine/invitation_history'
 				var datas={
-					key: that.options.type
+					page:that.page,
 				}
-				var jkurl='/info'
+				var nowpage=that.page
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
 				
-				// that.$service.P_post(jkurl, datas).then(res => {
-				// 	that.btnkg = 0
-				// 	console.log(res)
-				// 	if (res.code == 1) {
-				// 		that.htmlReset = 0
-				// 		var datas = res.data
-				// 		console.log(typeof datas)
-				
-				// 		if (typeof datas == 'string') {
-				// 			datas = JSON.parse(datas)
-				// 		}
-				// 		console.log(res)
-				// 		that.datas=datas.info.content
-				// 		if(datas.info.title){
-				// 			uni.setNavigationBarTitle({
-				// 				title:datas.info.title
-				// 			})
-				// 		}
-				// 	} else {
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						if(nowpage==1){
+							that.datas=datas.data
+						}else{
+							that.datas=that.datas.concat(datas.data)
+						}
+						if(datas.data.length==0){
+							return
+						}
+						that.page++
+					} else {
 					
-				// 		if (res.msg) {
-				// 			uni.showToast({
-				// 				icon: 'none',
-				// 				title: res.msg
-				// 			})
-				// 		} else {
-				// 			uni.showToast({
-				// 				icon: 'none',
-				// 				title: '获取数据失败'
-				// 			})
-				// 		}
-				// 	}
-				// }).catch(e => {
-				// 	that.htmlReset = 1
-				// 	that.btnkg = 0
-				// 	// that.$refs.htmlLoading.htmlReset_fuc(1)
-				// 	console.log(e)
-				// 	uni.showToast({
-				// 		icon: 'none',
-				// 		title: '获取数据失败，请检查您的网络连接'
-				// 	})
-				// })
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
 			},
 			getimg(img){
 				return service.getimg(img)

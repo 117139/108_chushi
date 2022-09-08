@@ -1,7 +1,10 @@
 <template>
 	<view class="aboutMy">
 		<!-- 关于我们 -->
-		<view class="img_wrap area2">
+		<view class="words_text">
+			 <uParse v-if="basedata.gywm" :content="basedata.gywm"></uParse>
+		</view>
+		<!-- <view class="img_wrap area2">
 			<image src="@/static/images/cszp.png" mode="aspectFilla"></image>
 		</view>
 		
@@ -20,11 +23,17 @@
 		</view>
 		<view class="contact_wrap area2">
 			手机：{{phone}}
-		</view>
+		</view> -->
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
@@ -35,8 +44,11 @@
 				
 			}
 		},
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','loginDatas','basedata']),
+		},
 		onLoad() {
-			this.getCate()
+			// this.getCate()
 		},
 		methods: {
 			getCate() { //判断显示静态页 还是 数据页

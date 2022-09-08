@@ -112,7 +112,7 @@
 						})
 						return
 					}
-					var pid=uni.getStorageSync('pid')||''
+					var pid=uni.getStorageSync('up_id')||''
 					//1、web 2、小程序 3、token
 					datas={
 						type:1,

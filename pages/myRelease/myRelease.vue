@@ -3,39 +3,39 @@
 		<!-- 我的发布 -->
 		<view class="tabs_wrap flex_aro">
 			<view :class="current==index?'tabs_active':'tabs'" v-for="(item,index) in tabs" :key="index"
-				@tap="current=index">
-				{{item}}
+				@tap="setcur(index)">
+				{{item.title}}
 			</view>
 		</view>
-		<view class="no_release" v-if="list.length==0">
-			暂无发布
+		<view class="no_release" v-if="datas.length==0">
+			暂无数据
 		</view>
 
-		<view class="list_box" v-else v-for="(item,index) in list" :key="index"
-			@tap="$sjuNav.navTo(`/pages/orderDetails/orderDetails`)">
+		<view class="list_box" v-else v-for="(item,index) in datas" :key="index"
+			@tap="go_jump(item)">
 			<view class="list_header flex_bet">
-				<view class="list_header_l flex_ali">
-					<image :src="item.userImg" mode="aspectFill"></image>
+				<view v-if="item.user" class="list_header_l flex_ali">
+					<image :src="$service.getimg(item.user.img)" mode="aspectFill"></image>
 					<view class="list_header_text">
 						<view class="">
-							{{item.userName}}
+							{{item.user.nick}}
 						</view>
 						<view class="list_header_time">
-							{{item.time}}
+							{{item.update_time}}
 						</view>
 					</view>
 				</view>
-				<view class="istop">
+				<view class="istop" v-if="item.is_top==1">
 					置顶
 				</view>
 			</view>
 			<view class="words_text">
-				<view v-html="item.contentText"></view>
+				<view >{{item.content}}</view>
 			</view>
 
 			<view class="img_list flex">
-				<view v-for="(item,index2) in item.imgUrl" :key="index2">
-					<image :src="item" mode="aspectFill"></image>
+				<view  class="img_li" v-for="(item1,index2) in item.img_arr" :key="index2">
+					<image :src="$service.getimg(item1)" mode="aspectFill"></image>
 				</view>
 			</view>
 			<view class="list_botm flex_bet">
@@ -53,17 +53,23 @@
 				</view>
 			</view>
 			<view class="list_btom area flex_bet">
-				<view :class="{idle:item.state==0,idle2:item.state==1,idle3:item.state==2}">
-					{{staute[item.state]}}
+				<view class="idle" v-if="item.is_examine==1">
+					审核中>
+				</view>
+				<view class="idle2" v-if="item.is_examine==2">
+					已发布
+				</view>
+				<view class="idle3" v-if="item.is_examine==3">
+					审核失败
 				</view>
 				<view class=" flex_ali">
-					<view class="edit_wrap flex_ali">
+					<view class="edit_wrap flex_ali" @click.stop="$service.jump" :data-url="'/pagesMy/fabu_edit/fabu_edit?id='+item.id">
 						<text class="icon icon-bianjisekuai"></text>
 						<view class="">
 							编辑
 						</view>
 					</view>
-					<view class="edit_wrap left_edit flex_ali">
+					<view class="edit_wrap left_edit flex_ali" @click.stop="del_fuc(item)">
 						<text class="icon icon-shanchu"></text>
 						<view class="">
 							删除
@@ -77,20 +83,208 @@
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that = null
 	export default {
 		data() {
 			return {
-				tabs: [],
-				current: 0,
+				// tabs: [],
 				list: [],
-				staute: ['审核中', '已发布', '未通过'], //审核状态
-
+				tabs: [
+					{
+						title:'全部',
+						id:''
+					},
+					{
+						title:'已发布',
+						id:2
+					},
+					{
+						title:'审核中',
+						id:1
+					},
+				], //审核状态
+				current: 0,
+				datas:[]
 			}
 		},
+		computed: {
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+		},
 		onLoad() {
-			this.getCate()
+			that=this
+		},
+		onShow() {
+			that.onRetry()
+		},
+		onReachBottom() {
+			that.getdatas()
 		},
 		methods: {
+			setcur(index){
+				that.current=index
+				that.onRetry()
+			},
+			go_jump(item){
+				// $sjuNav.navTo(`/pages/orderDetails/orderDetails`)
+				//1、未审核 2、审核成功 3、审核失败
+				if(item.is_examine==1){
+					uni.navigateTo({
+						url:'/pages/status/status?num=0'
+					})
+				}
+				if(item.is_examine==2){
+					uni.navigateTo({
+						url:'/pages/orderDetails/orderDetails?id='+item.id
+					})
+				}
+				if(item.is_examine==3){
+					uni.navigateTo({
+						url:'/pagesMy/fabu_edit/fabu_edit?id='+item.id
+					})
+				}
+			},
+			del_fuc(item){
+				uni.showModal({
+				    title: '提示',
+				    content: '是否删除该信息',
+				    success: function (res) {
+				        if (res.confirm) {
+				            console.log('用户点击确定');
+										var jkurl='/mine/sub_del'
+										var datas={
+											id:item.id
+											// address_id:''
+										}
+										var header={
+											'content-type': 'application/json',
+										}
+										// that.$service.P_post(jkurl, datas,header).then(res => {
+										that.$service.P_post(jkurl, datas).then(res => {
+											that.btnkg = 0
+											console.log(res)
+											if (res.code == 1){
+												that.htmlReset = 0
+												var datas = res.data
+												console.log(typeof datas)
+										
+												if (typeof datas == 'string') {
+													datas = JSON.parse(datas)
+												}
+												console.log(res)
+												
+												uni.showToast({
+													icon:'none',
+													title:'删除成功'
+												})
+												// that.datas.splice(index,1)
+												setTimeout(()=>{
+													that.onRetry()
+												},1000)
+											} else {
+											
+												if (res.msg) {
+													uni.showToast({
+														icon: 'none',
+														title: res.msg
+													})
+												} else {
+													uni.showToast({
+														icon: 'none',
+														title: '获取数据失败'
+													})
+												}
+											}
+										}).catch(e => {
+											that.htmlReset = 1
+											that.btnkg = 0
+											// that.$refs.htmlLoading.htmlReset_fuc(1)
+											console.log(e)
+											uni.showToast({
+												icon: 'none',
+												title: '获取数据失败，请检查您的网络连接'
+											})
+										})
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+				    }
+				});
+			},
+			onRetry(){
+				that.page=1
+				that.datas=[]
+				that.getdatas()
+				
+			},
+			
+			getdatas(){
+				// return
+				uni.showLoading({
+						mask:true,
+						title:'正在获取数据'
+				})
+				var jkurl='/mine/sub'
+				var datas={
+					page:that.page,
+					is_examine:that.tabs[that.current].id
+				}
+				var nowpage=that.page
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						
+						if(nowpage==1){
+							that.datas=datas.data
+						}else{
+							that.datas=that.datas.concat(datas.data)
+						}
+						if(datas.data.length==0){
+							return
+						}
+						that.page++
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
+			
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 					this.tabs = ['全部', '已发布', '审核中']
@@ -242,7 +436,7 @@
 
 			.words_text {
 				width: 100%;
-				min-height: 80rpx;
+				max-height: 80rpx;
 				line-height: 40rpx;
 				font-size: 30rpx;
 				font-family: PingFang SC;
@@ -259,16 +453,20 @@
 
 			.img_list {
 				width: 100%;
-				height: 160rpx;
+				// height: 160rpx;
 
-				image {
-					width: 160rpx;
-					height: 160rpx;
-					margin-right: 18rpx;
-				}
-
-				&:last-child {
-					margin-right: 0;
+				.img_li{
+					width: 25%;
+					padding: 6rpx;
+					height: 162rpx;
+					image {
+						width: 100%;
+						height: 100%;
+					
+						// &:nth-last-child() {
+						// 	margin-right: 0;
+						// }
+					}
 				}
 			}
 

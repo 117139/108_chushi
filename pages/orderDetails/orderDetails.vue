@@ -32,7 +32,10 @@
 
 			<view class="content_text area">{{datas.content}}</view>
 			<view class="img_wrap flex">
-				<image :src="$service.getimg(item)" mode="aspectFill" v-for="(item,index) in datas.img_arr" :key="index" @tap="imgClick(item,index)" lazy-load="true"></image>
+				<view class="img_li" v-for="(item,index) in datas.img_arr" :key="index">
+					<image :src="$service.getimg(item)" mode="aspectFill" @tap="imgClick(item,index)" lazy-load="true"></image>
+				</view>
+				
 			</view>
 
 			<view class="report_text flex_ali" @tap="$service.jump" :data-url="'/pages/tipOff/tipOff?id='+options.id">
@@ -59,7 +62,7 @@
 				</view>
 				<!-- #endif -->
 				<!-- #ifdef H5 -->
-				<view class="share_wrap flex_cen">
+				<view class="share_wrap flex_cen" @click="$service.copy_fuc">
 					<text class="icon icon-fenxiang"></text>
 					<view class="">
 						分享好友
@@ -91,7 +94,7 @@
 		data() {
 			return {
 				userImg: '',
-				userName: "",
+				// userName: "",
 				time: "",
 				address: "", //定位地址
 				rangeNum: '', //距离
@@ -106,7 +109,14 @@
 			}
 		},
 		computed: {
-			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+			...mapState(['hasLogin', 'forcedLogin', 'userinfo','tab_list','my_address','basedata','loginDatas']),
+		},
+		onShareAppMessage() {
+			var up_id=that.loginDatas.id||''
+			return {
+				title: '招厨师群',
+				path: '/pages/index/index?up_id='+up_id
+			}
 		},
 		onLoad(e) {
 			that=this
@@ -121,7 +131,9 @@
 			getdatas(){
 				var jkurl='/index/detail'
 				var datas={
-					id:that.options.id
+					id:that.options.id,
+					lat:that.my_address.latitude||'',
+					lng:that.my_address.longitude||''
 				}
 				var header={
 					'content-type': 'application/json',
@@ -367,13 +379,25 @@
 			height: auto;
 			flex-wrap: wrap;
 			padding: 0 19rpx;
-
-			image {
-				width: 160rpx;
-				height: 160rpx;
-				border-radius: 4rpx;
-				margin: 0 9rpx 20rpx 9rpx;
+			.img_li{
+				width: 25%;
+				padding: 6rpx;
+				height: 162rpx;
+				image {
+					width: 100%;
+					height: 100%;
+				
+					// &:nth-last-child() {
+					// 	margin-right: 0;
+					// }
+				}
 			}
+			// image {
+			// 	width: 160rpx;
+			// 	height: 160rpx;
+			// 	border-radius: 4rpx;
+			// 	margin: 0 9rpx 20rpx 9rpx;
+			// }
 		}
 
 		.report_text {
@@ -440,15 +464,7 @@
 				margin-right: 12rpx;
 			}
 		}
-		.share_wrap_btn{
-			position: absolute;
-			opacity: 0;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			z-index: 100;
-		}
+		
 		.dial_wrap {
 			width: 338rpx;
 			height: 80rpx;

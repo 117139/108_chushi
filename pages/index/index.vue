@@ -2,14 +2,14 @@
 	<view class="content ">
 		<!-- 搜索框 -->
 		<view class="header_search area flex_bet">
-			<view class="header_address flex_cen" @tap="$sjuNav.navTo(`/pages/selectAddress/selectAddress`)">
+			<view class="header_address  oh1" @tap="$sjuNav.navTo(`/pages/selectAddress/selectAddress`)">
 				<text class="icon icon-dizhi address_icon"></text>
-				<view class="">{{address}}</view>
+				<text class="">{{my_address?my_address.city:'北京市'}}</text>
 			</view>
 			<view class="input_wrap flex">
 				<input class="uni-input" type="text" placeholder="请输入您要搜索的内容"
-					placeholder-style="font-size: 28rpx;color: #CCCCCC;" v-model="value">
-				<view class="icon icon-ic_search24px search_icon"></view>
+					placeholder-style="font-size: 28rpx;color: #CCCCCC;" v-model="value" @confirm="onRetry">
+				<view class="icon icon-ic_search24px search_icon" @click="onRetry"></view>
 			</view>
 		</view>
 
@@ -40,7 +40,7 @@
 		<view class="big_box area2">
 			<view class="tabs_wrap flex">
 				<view :class="current==index?'tabs_active':'tabs'" v-for="(item,index) in tabs" :key="index"
-					@tap="current=index">
+					@tap="set_list(index)">
 					{{item.title}}
 				</view>
 			</view>
@@ -91,7 +91,7 @@
 				
 			</view>
 			<!-- #ifdef MP-WEIXIN -->
-			<view class="advertisement_wrap2" v-if="index>0 && index%banner_interval==0	">
+			<view class="advertisement_wrap2" v-if="index>0 && index%basedata.banner_interval==0	">
 				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
 			</view>
 			<!-- #endif -->
@@ -104,13 +104,19 @@
 			</view> -->
 		</view>
 		<view class="botm_img flex_dir">
-			<image src="/static/images/hb.png" mode="aspectFit"></image>
+			<!-- #ifdef H5 -->
+			<image v-if="basedata.is_yaoqing==1" src="/static/images/hb.png" mode="aspectFit"></image>
+			<!-- #endif -->
 			<!-- #ifdef MP-WEIXIN -->
+			<view class="" style="position: relative;">
+				<button open-type="share" class="share_wrap_btn"></button>
+				<image v-if="basedata.is_yaoqing==1" src="/static/images/hb.png" mode="aspectFit"></image>
+			</view>
 			<image src="/static/images/hqjf.png" mode="aspectFit" @click="setad"></image>
 			<!-- #endif -->
 		</view>
 		<view class="botm_img1 flex_dir">
-			<image src="/static/images/wyzq2.png" mode="aspectFit" @click="jump_fuc('/pages/makeMoney/makeMoney')"></image>
+			<image v-if="basedata.is_zuanqian==1" src="/static/images/wyzq2.png" mode="aspectFit" @click="jump_fuc('/pages/makeMoney/makeMoney')"></image>
 			<!-- #ifdef MP-WEIXIN -->
 			<image src="/static/images/sj.png" mode="aspectFit" @click="setad"></image>
 			<!-- #endif -->
@@ -126,7 +132,6 @@
 		mapMutations
 	} from 'vuex'
 	var that = null
-	let videoAd = null
 	export default {
 		data() {
 			return {
@@ -150,47 +155,56 @@
 		},
 		
 		computed: {
-			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata','loginDatas']),
 		},
-		onLoad() {
+		
+		onShareAppMessage() {
+			var up_id=that.loginDatas.id||''
+			return {
+				title: '招厨师群',
+				imageUrl:that.basedata.share_index,
+				path: '/pages/index/index?up_id='+up_id
+			}
+		},
+		
+		onLoad(e) {
 			that=this
+			if(e.up_id){
+				console.log('e.up_id------------------')
+				console.log(e.up_id)
+				uni.setStorageSync('up_id',e.up_id)
+			}
+			if(e.scene){
+				const scene = decodeURIComponent(e.scene)
+				console.log(scene)
+				var arr=scene.split('=')
+				console.log(scene)
+				var obj = {};
+				obj[arr[0]] = arr[1]
+				// this.uid = obj.user_id
+				uni.setStorageSync('up_id',obj.up_id)
+			}
+			
+			that.getadvert()
 			that.getnotice()
 			that.gettype()
-			// #ifdef MP-WEIXIN
-			if (wx.createRewardedVideoAd) {
-			  videoAd = wx.createRewardedVideoAd({
-			    adUnitId: 'adunit-06d5a767981630e7'
-			  })
-			  videoAd.onLoad(() => {})
-			  videoAd.onError((err) => {})
-			  videoAd.onClose((res) => {})
-			}
-			// #endif
 			
+			
+			uni.$emit('getbasedata', {
+				title: ' 刷新信息 ',
+				content: 'item.id'
+			});
 		},
+		
 		onReachBottom() {
 			that.getdatas()
 		},
 		methods: {
-			setad(){
-				// 在页面中定义激励视频广告
-				// 在页面onLoad回调事件中创建激励视频广告实例
-				/* #ifdef MP-WEIXIN */
-				
-				
-				// // 用户触发广告后，显示激励视频广告
-				if (videoAd) {
-				  videoAd.show().catch(() => {
-				    // 失败重试
-				    videoAd.load()
-				      .then(() => videoAd.show())
-				      .catch(err => {
-				        console.log('激励视频 广告显示失败')
-				      })
-				  })
-				}
-				/* #endif */
+			set_list(index){
+				that.current=index
+				that.onRetry()
 			},
+			
 			//公告
 			getnotice(){
 				var jkurl='/index/notice'
@@ -301,9 +315,10 @@
 				var jkurl='/index/lists'
 				var datas={
 					page:that.page,
+					title:that.value,
 					pid:that.tabs[that.current].id||'',
-					lat:that.my_address.lat||'',
-					lng:that.my_address.lng||''
+					lat:that.my_address.latitude||'',
+					lng:that.my_address.longitude||''
 				}
 				var nowpage=that.page
 				var header={
@@ -383,8 +398,10 @@
 			z-index: 9;
 
 			.header_address {
+				width: 180rpx;
 				color: #ffffff;
-
+				line-height: 40rpx;
+				height: 40rpx;
 				.address_icon {
 					font-size: 34rpx;
 					margin-right: 10rpx;
@@ -639,7 +656,7 @@
 
 				.img_list {
 					width: 100%;
-					height: 156rpx;
+					// height: 156rpx;
 					flex-wrap: wrap;
 					margin-top: 20rpx;
 					.img_li{

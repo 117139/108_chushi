@@ -7,7 +7,8 @@
 				<view class="status_list">
 					{{statusList[value]}}
 				</view>
-				<view class="ascertain" @tap="$sjuNav.switchTab(`/pages/index/index`)">
+				<!-- <view class="ascertain" @tap="$sjuNav.switchTab(`/pages/index/index`)"> -->
+				<view class="ascertain" @tap="$service.back">
 					确定
 				</view>
 			</view>
@@ -22,8 +23,11 @@
 				value:0,//0审核中，1提交成功
 				colorList:['#FF9900','#58BE6C'],
 				iconType:['waiting','success'],
-				statusList:['审核中','发布成功'],
+				statusList:['审核中','提交成功'],
 			}
+		},
+		onLoad(e) {
+			that.value=e.num
 		},
 		methods: {
 			

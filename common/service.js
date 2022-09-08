@@ -6,11 +6,11 @@ const STATE_KEY = 'STATE_KEY';
 const map_key = "7FEBZ-WLWK2-PMGUE-C4BFT-EKXB6-BFFNR"
 const appVN=1
 // const baseurl = "https://ayi.a.800123456.vip/"
-const baseurl = "http://192.168.0.108/"
+const baseurl = "http://cook.a.800123456.vip/"
 // const baseurl = "http://tumei.xyz/"
 let imgurl = baseurl
 var  IPurl = baseurl + 'api/'
-
+var  share_H5='http://192.168.0.111:8083/#/'
 const limit=20
 // if(appVN==0){
 // 	imgurl='https://www.wanbonet.com/suxin/106_dianshang/'
@@ -2091,6 +2091,18 @@ const getKm=function(num) {
 	return num
 }
 
+const copy_fuc=function(){
+	uni.setClipboardData({
+		data: share_H5,
+		success: function () {
+			console.log('success');
+			uni.showToast({
+				icon:'none',
+				title:'分享链接已复制到剪切板，快去分享'
+			})
+		}
+	});
+}
 export default {
 	getUsers,
 	addUser,
@@ -2127,5 +2139,7 @@ export default {
 	set_num,
 	LNum,
 	limit,
-	getKm
+	getKm,
+	share_H5,
+	copy_fuc
 }

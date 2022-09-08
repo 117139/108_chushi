@@ -1,24 +1,37 @@
 <template>
 	<view class="makeMoney bottom-of-page">
 		<!-- 我要赚钱 -->
-		<view class="word_text area" v-html="wordText"></view>
-		
-		<view class="btn_bottom bottom-button" @click="$service.jump" :data-url="'/pagesMy/shenqing/shenqing'">
-			立即申请
+		<view class="word_text area">
+			 <uParse v-if="basedata.yaoqing" :content="basedata.yaoqing"></uParse>
 		</view>
 		
+		<view class="btn_bottom_box">
+			<view class="btn_bottom bottom-button" @click="$service.jump" :data-url="'/pagesMy/shenqing/shenqing'"  :data-login="true">
+				立即申请
+			</view>
+			
+		</view>
 	</view>
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
 				wordText:``,
 			}
 		},
+		computed: {
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','loginDatas','basedata']),
+		},
 		onLoad() {
-			this.getCate()
+			// this.getCate()
 		},
 		methods: {
 			getCate() { //判断显示静态页 还是 数据页
@@ -44,12 +57,22 @@
 	height: 100%;
 	min-height: 100vh;
 	padding-top: 60rpx;
+	background: #fff;
 	.word_text{
 		line-height: 42rpx;
 		font-size: 30rpx;
 		font-family: PingFang SC;
 		font-weight: 400;
 		color: #333333;
+	}
+	.btn_bottom_box{
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 28rpx;
+		z-index: 900;
+		background: #fff;
 	}
 	.btn_bottom{
 		width: 694rpx;
@@ -62,10 +85,10 @@
 		font-family: PingFang SC;
 		font-weight: 400;
 		color: #FFFFFF;
-		position: fixed;
-		bottom: 16rpx;
-		left: 50%;
-		transform: translate(-50%,0);
+		// position: fixed;
+		// bottom: 16rpx;
+		// left: 50%;
+		// transform: translate(-50%,0);
 	}
 }
 </style>

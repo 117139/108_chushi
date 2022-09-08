@@ -32,7 +32,11 @@ const store = new Vuex.Store({
 		
 		basedata:'',
 		tab_list:[],
-		my_address:'', //地址信息
+		my_address:{
+			city:'北京市',
+			longitude:'',
+			latitude:'',
+		}, //地址信息
 	},
 	mutations: {
 		set_my_address(state, my_address) {

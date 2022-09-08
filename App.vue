@@ -13,6 +13,7 @@
 			if(token){
 				that.$service.wxlogin('token')
 			}
+			that.getadd()
 			that.gettabs()
 			that.getbasedata()
 			uni.$on('login_fuc', (data) => {
@@ -75,6 +76,70 @@
 						}
 						console.log(res)
 						that.$store.commit('set_tab_list',res.data)
+						// that.getdata_tz()
+						// if(datas.title){
+						// 	uni.setNavigationBarTitle({
+						// 		title:datas.title
+						// 	})
+						// }
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
+				})
+			},
+			getadd(){
+				var datas={}
+				var jkurl='/login/weizhi'
+				
+				that.$service.P_get(jkurl, datas).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						var city=datas.city
+						if(city==[]){
+							city=datas.province
+						}
+						var rectangle=datas.rectangle
+						if(rectangle){
+							rectangle=rectangle.split(';')
+							rectangle=rectangle[0]
+							rectangle=rectangle.split(',')
+						}
+						var address={
+							city:city,
+							longitude:rectangle[0]||'',
+							latitude:rectangle[1]||'',
+						}
+						that.$store.commit('set_my_address',address)
+						// that.$store.commit('set_basedata',res.data)
 						// that.getdata_tz()
 						// if(datas.title){
 						// 	uni.setNavigationBarTitle({
@@ -410,5 +475,15 @@
 		color: #666;
 		text-align: center;
 		font-size: 32rpx;
+		line-height: 150rpx;
+	}
+	.share_wrap_btn{
+		position: absolute;
+		opacity: 0;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 950;
 	}
 </style>

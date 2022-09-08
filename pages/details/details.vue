@@ -9,7 +9,7 @@
 		</view> -->
 		
 		<view class="words_text">
-			 <!-- <uParse v-if="datas.content" :content="datas.content"></uParse> -->
+			 <uParse v-if="datas.content" :content="datas.content"></uParse>
 		</view>
 		
 	</view>

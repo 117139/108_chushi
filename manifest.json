@@ -83,14 +83,14 @@
                 }
             }
         },
-        "template" : "index.html",
+        "template" : "main.html",
         "title" : "招厨师群",
         "router" : {
             "mode" : "hash"
         },
         "optimization" : {
             "treeShaking" : {
-                "enable" : true
+                "enable" : false
             }
         }
     }

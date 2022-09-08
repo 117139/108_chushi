@@ -34,6 +34,12 @@
 </template>
 
 <script>
+	import Vue from 'vue'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	var that 
 	export default {
 		data() {
 			return {
@@ -41,8 +47,14 @@
 				seleAddress:"",//选择地址
 			}
 		},
+		
+		computed: {
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata','loginDatas']),
+		},
 		onLoad() {
-			this.getCate()
+			that=this
+			// this.getCate()
+			that.address=that.my_address
 		},
 		methods: {
 			getCate() { //判断显示静态页 还是 数据页
@@ -75,9 +87,65 @@
 				})
 			},
 			back(){//确定
-				uni.navigateBack({
-					delta:1
+				///login/weizhi
+				var jkurl='/login/weizhi'
+				var datas={
+					lat:this.address.latitude,
+					lng:this.address.longitude,
+				}
+				var header={
+					'content-type': 'application/json',
+				}
+				that.$service.P_post(jkurl, datas,header).then(res => {
+					that.btnkg = 0
+					console.log(res)
+					if (res.code == 1) {
+						that.htmlReset = 0
+						var datas = res.data
+						console.log(typeof datas)
+				
+						if (typeof datas == 'string') {
+							datas = JSON.parse(datas)
+						}
+						console.log(res)
+						// var addressComponent=datas.regeocode.addressComponent
+						var city=datas.result.address_component.city||''
+						// if(city==[]){
+						// 	city=addressComponent.province
+						// }
+						var address={
+							city:city,
+							...that.address
+						}
+						that.$store.commit('set_my_address',address)
+						uni.navigateBack({
+							delta:1
+						})
+					} else {
+					
+						if (res.msg) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '获取数据失败'
+							})
+						}
+					}
+				}).catch(e => {
+					that.htmlReset = 1
+					that.btnkg = 0
+					// that.$refs.htmlLoading.htmlReset_fuc(1)
+					console.log(e)
+					uni.showToast({
+						icon: 'none',
+						title: '获取数据失败，请检查您的网络连接'
+					})
 				})
+				
 			},
 		}
 	}
