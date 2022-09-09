@@ -140,6 +140,7 @@
 							icon: 'none',
 							title: '登录成功'
 						})
+						uni.setStorageSync('up_id','')
 						that.$store.commit('login',datas)
 						// return
 						setTimeout(()=>{
@@ -328,8 +329,11 @@
 							console.log(e.detail.encryptedData)  
 							//e.detail.encryptedData      //加密的用户信息  
 							//e.detail.iv     //加密算法的初始向量  时要用到  
+							
+							var pid=uni.getStorageSync('up_id')||''
 							var datas = {
 								code:e.detail.code,
+								pid:pid
 								// token:token,
 							}
 							var jkurl = '/login/getphone'
@@ -345,7 +349,7 @@
 										datas = JSON.parse(datas)
 									}
 									console.log(res)
-									
+									uni.setStorageSync('up_id','')
 									that.$store.commit('login',datas)
 									// return
 									setTimeout(()=>{

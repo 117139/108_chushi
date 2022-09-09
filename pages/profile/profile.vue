@@ -10,7 +10,7 @@
 			
 			<!-- 我的 -->
 			<view class="header_img_backImg">
-				<image src="@/static/images/wdbj.png" mode="aspectFill"></image>
+				<image src="/static/images/wdbj.png" mode="aspectFill"></image>
 			</view>
 			<view class="content_wrap">
 				<view class="content_wrap_header flex_ali">
@@ -33,7 +33,7 @@
 						</view>
 						<view class=" flex_ali">
 							<view class="integral_num">
-								{{loginDatas.people||'0'}}
+								{{loginDatas.point||'0'}}
 							</view>
 							<view class="icon icon-youjiantou icon_r"></view>
 						</view>
@@ -95,6 +95,11 @@
 					</view>
 				</view>
 			</view>
+			<!-- #ifdef H5 -->
+			<view v-if="hasLogin" class="logout_btn" @click="out_fuc">
+				<text>退出</text>
+			</view>
+			<!-- #endif -->
 			<tab-list pageurl="/pages/profile/profile"></tab-list>
 			<!-- <popUp :isShow="isShow" v-model="isShow"></popUp> -->
 		</view>
@@ -111,9 +116,7 @@
 	export default {
 		data() {
 			return {
-				userImg: '', //用户头像
-				// userName: '', //用户名
-				integral: "", //我的积分
+				
 				phone: "", //联系客服
 				isShow: true, //弹窗广告
 			}
@@ -123,12 +126,40 @@
 		},
 		onLoad() {
 			// this.getCate()
-			uni.$emit('login_fuc', {
-				title: ' 刷新信息 ',
-				content: 'item.id'
-			});
+			that=this
+			if(that.hasLogin){
+				
+				uni.$emit('login_fuc', {
+					title: ' 刷新信息 ',
+					content: 'item.id'
+				});
+			}
 		},
 		methods: {
+			...mapMutations(['logout']),
+			out_fuc(){
+				uni.showModal({
+				    title: '提示',
+				    content: '是否退出当前账号',
+				    success: function (res) {
+				        if (res.confirm) {
+				            that.logout()
+										uni.showToast({
+											title:'退出成功',
+											icon:'none'
+										})
+										setTimeout(function(){
+											uni.navigateTo({
+												url:'/pages/login/login'
+											})
+										},1000)
+				           
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+				    }
+				});
+			},
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 					this.userImg = '/static/images/tx.jpg'
@@ -174,9 +205,9 @@
 		.content_wrap {
 			width: 100%;
 			height: 100%;
-			position: absolute;
-			top: 0;
-			left: 0;
+			position: relative;
+			// top: 0;
+			// left: 0;
 			z-index: 9;
 
 			.content_wrap_header {
@@ -185,7 +216,8 @@
 				font-weight: 500;
 				color: #FFFFFF;
 				padding-left: 28rpx;
-				margin-top: 34rpx;
+				// margin-top: 34rpx;
+				padding-top: 34rpx;
 				margin-bottom: 26rpx;
 
 				image {
@@ -268,5 +300,21 @@
 		.border_botm {
 			// border-bottom: 1px solid #EEEEEE;
 		}
+	}
+	.logout_btn{
+		width: 690rpx;
+		height: 80rpx;
+		margin: 30rpx auto;
+		display: flex;
+		align-content: center;
+		justify-content: center;
+		background: #ED4149;
+		border-radius: 10rpx;
+		font-size: 32rpx;
+		font-family: PingFang SC;
+		font-weight: 400;
+		color: #F5F5F5;
+		line-height: 80rpx;
+		
 	}
 </style>

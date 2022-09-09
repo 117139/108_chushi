@@ -6,7 +6,7 @@
 		</view>
 		<view class="location_address flex_bet" @tap="chooseLocation">
 			<view class="address_word">
-				{{address?address.address:'请选择地址'}}
+				{{address.address?address.address:'请选择地址'}}
 			</view>
 			<view class="location_r flex_ali">
 				<view class="icon icon-dizhi address_icon"></view>

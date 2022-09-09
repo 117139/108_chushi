@@ -81,13 +81,16 @@
 	 }
 	 .words_text{
 		 height: auto;
-		 line-height: 40rpx;
+		 min-height: 100vh;
+		 // line-height: 40rpx;
 		 font-size: 30rpx;
 		 font-family: PingFang SC;
 		 font-weight: 400;
 		 color: #333333;
-		 margin-top: 56rpx;
-		 margin-bottom: 80rpx;
+		 background: #fff;
+		 // margin-top: 56rpx;
+		 // margin-bottom: 80rpx;
+		 padding: 30rpx;
 	 }
 	 .line_tit{
 		 line-height: 60rpx;

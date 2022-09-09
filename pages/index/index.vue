@@ -1,15 +1,24 @@
 <template>
-	<view class="content ">
+	<view class="content " :style="'padding-top: calc(100rpx + '+CustomBar+'px)'">
+		
+		
 		<!-- 搜索框 -->
-		<view class="header_search area flex_bet">
-			<view class="header_address  oh1" @tap="$sjuNav.navTo(`/pages/selectAddress/selectAddress`)">
-				<text class="icon icon-dizhi address_icon"></text>
-				<text class="">{{my_address?my_address.city:'北京市'}}</text>
-			</view>
-			<view class="input_wrap flex">
-				<input class="uni-input" type="text" placeholder="请输入您要搜索的内容"
-					placeholder-style="font-size: 28rpx;color: #CCCCCC;" v-model="value" @confirm="onRetry">
-				<view class="icon icon-ic_search24px search_icon" @click="onRetry"></view>
+		<view class="header_search">
+			<topbar bg_color="#ED4149">
+				<text style="color: #fff;"></text>
+				<text style="color: #fff;">厨师招聘</text>
+				<text style="color: #fff;"></text>
+			</topbar>
+			<view class="top_box  area flex_bet">
+				<view class="header_address  oh1" @tap="$sjuNav.navTo(`/pages/selectAddress/selectAddress`)">
+					<text class="icon icon-dizhi address_icon"></text>
+					<text class="">{{my_address?my_address.city:'北京市'}}</text>
+				</view>
+				<view class="input_wrap flex">
+					<input class="uni-input" type="text" placeholder="请输入您要搜索的内容"
+						placeholder-style="font-size: 28rpx;color: #CCCCCC;" v-model="value" @confirm="onRetry">
+					<view class="icon icon-ic_search24px search_icon" @click="onRetry"></view>
+				</view>
 			</view>
 		</view>
 
@@ -23,8 +32,8 @@
 			</view>
 		</view> -->
 		<!-- #ifdef MP-WEIXIN -->
-		<view class="advertisement_wrap area2">
-			<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
+		<view v-if="basedata.key_1" class="advertisement_wrap area2">
+			<ad class="advertisement_wrap area2" :unit-id="basedata.key_1"></ad>
 		</view>
 		<!-- #endif -->
 		<!-- ad -->
@@ -43,6 +52,9 @@
 					@tap="set_list(index)">
 					{{item.title}}
 				</view>
+			</view>
+			<view class="data_null" v-if="datas.length==0">
+				暂无数据
 			</view>
 			<block  v-for="(item,index) in datas" :key="index">
 			<view class="list_box"  @click="$service.jump" :data-url="'/pages/orderDetails/orderDetails?id='+item.id">
@@ -91,9 +103,11 @@
 				
 			</view>
 			<!-- #ifdef MP-WEIXIN -->
-			<view class="advertisement_wrap2" v-if="index>0 && index%basedata.banner_interval==0	">
-				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
-			</view>
+			<block  v-if="basedata.key_1">
+				<view class="advertisement_wrap2" v-if="index>0 && index%basedata.banner_interval==0	">
+					<ad class="advertisement_wrap area2" :unit-id="basedata.key_1"></ad>
+				</view>
+			</block>
 			<!-- #endif -->
 			</block>
 			<!-- <view class="advertisement_wrap2">
@@ -105,12 +119,12 @@
 		</view>
 		<view class="botm_img flex_dir">
 			<!-- #ifdef H5 -->
-			<image v-if="basedata.is_yaoqing==1" src="/static/images/hb.png" mode="aspectFit"></image>
+			<image v-if="basedata.is_yaoqing==1" @click="$service.copy_fuc" src="/static/images/hb.png" mode="aspectFit"></image>
 			<!-- #endif -->
 			<!-- #ifdef MP-WEIXIN -->
-			<view class="" style="position: relative;">
+			<view v-if="basedata.is_yaoqing==1" class="" style="position: relative;">
 				<button open-type="share" class="share_wrap_btn"></button>
-				<image v-if="basedata.is_yaoqing==1" src="/static/images/hb.png" mode="aspectFit"></image>
+				<image src="/static/images/hb.png" mode="aspectFit"></image>
 			</view>
 			<image src="/static/images/hqjf.png" mode="aspectFit" @click="setad"></image>
 			<!-- #endif -->
@@ -132,9 +146,11 @@
 		mapMutations
 	} from 'vuex'
 	var that = null
+let videoAd = null
 	export default {
 		data() {
 			return {
+				CustomBar: this.CustomBar,
 				address: "北京市", //定位地址
 				value: '', //头部搜索框
 				wordsText: ``,
@@ -160,6 +176,9 @@
 		
 		onShareAppMessage() {
 			var up_id=that.loginDatas.id||''
+			if(up_id){
+				that.getsharejf_fuc()
+			}
 			return {
 				title: '招厨师群',
 				imageUrl:that.basedata.share_index,
@@ -169,11 +188,12 @@
 		
 		onLoad(e) {
 			that=this
-			if(e.up_id){
-				console.log('e.up_id------------------')
-				console.log(e.up_id)
-				uni.setStorageSync('up_id',e.up_id)
+			if(e.pid){
+				console.log('e.pid------------------')
+				console.log(e.pid)
+				uni.setStorageSync('up_id',e.pid)
 			}
+			// e.scene='pid%3D5'
 			if(e.scene){
 				const scene = decodeURIComponent(e.scene)
 				console.log(scene)
@@ -182,7 +202,7 @@
 				var obj = {};
 				obj[arr[0]] = arr[1]
 				// this.uid = obj.user_id
-				uni.setStorageSync('up_id',obj.up_id)
+				uni.setStorageSync('up_id',obj.pid)
 			}
 			
 			that.getadvert()
@@ -194,6 +214,22 @@
 				title: ' 刷新信息 ',
 				content: 'item.id'
 			});
+			// #ifdef MP-WEIXIN
+			if(that.basedata.key_2){
+				if (wx.createRewardedVideoAd) {
+					videoAd = wx.createRewardedVideoAd({
+					  // adUnitId: 'adunit-06d5a767981630e7'
+					  adUnitId: that.basedata.key_2||'adunit-06d5a767981630e7'
+					})
+					videoAd.onLoad(() => {})
+					videoAd.onError((err) => {})
+					videoAd.onClose((res) => {
+						that.getjf(res)
+					})
+				}
+			  
+			}
+			// #endif
 		},
 		
 		onReachBottom() {
@@ -203,6 +239,58 @@
 			set_list(index){
 				that.current=index
 				that.onRetry()
+			},
+			// 激励广告
+			setad(){
+				var that=this
+				// 在页面中定义激励视频广告
+				// 在页面onLoad回调事件中创建激励视频广告实例
+				/* #ifdef MP-WEIXIN */
+				uni.showLoading({
+					mask:true,
+					title:'正在加载广告'
+				})
+				setTimeout(function(){
+					
+						uni.hideLoading()
+				},2000)
+				// // 用户触发广告后，显示激励视频广告
+				if (videoAd) {
+				  videoAd.show().catch(() => {
+				    // 失败重试
+				    videoAd.load()
+				      .then(() => videoAd.show())
+				      .catch(err => {
+				        console.log('激励视频 广告显示失败')
+				      })
+				  })
+				}else{
+					if(that.basedata.key_2){
+						if (wx.createRewardedVideoAd) {
+							videoAd = wx.createRewardedVideoAd({
+							  // adUnitId: 'adunit-06d5a767981630e7'
+							  adUnitId: that.basedata.key_2||'adunit-06d5a767981630e7'
+							})
+							videoAd.onLoad(() => {})
+							videoAd.onError((err) => {})
+							videoAd.onClose((res) => {
+								that.getjf(res)
+							})
+						}
+					  if (videoAd) {
+					    videoAd.show().catch(() => {
+					      // 失败重试
+					      videoAd.load()
+					        .then(() => videoAd.show())
+					        .catch(err => {
+					          console.log('激励视频 广告显示失败')
+					        })
+					    })
+					  }
+					}
+					
+				}
+				/* #endif */
 			},
 			
 			//公告
@@ -389,42 +477,48 @@
 		position: relative;
 
 		.header_search {
-			height: 100rpx;
 			background-color: #ED4149;
 			font-size: 28rpx;
 			position: fixed;
-			top: var(--window-top);
+			top: 0;
 			left: 0;
-			z-index: 9;
+			z-index: 900;
 
-			.header_address {
-				width: 180rpx;
-				color: #ffffff;
-				line-height: 40rpx;
-				height: 40rpx;
-				.address_icon {
-					font-size: 34rpx;
-					margin-right: 10rpx;
+			.top_box{
+				width: 100%;
+				padding: 0 28rpx;
+				height: 100rpx;
+				box-sizing: border-box;
+				.header_address {
+					width: 180rpx;
+					color: #ffffff;
+					line-height: 40rpx;
+					height: 40rpx;
+					.address_icon {
+						font-size: 34rpx;
+						margin-right: 10rpx;
+					}
 				}
-			}
-
-			.input_wrap {
-				width: 540rpx;
-				height: 64rpx;
-				background: #FFFFFF;
-				border-radius: 10rpx;
-				padding: 0 20rpx;
-				align-items: center;
-
-				input {
-					width: 100%;
-					height: 100%;
-				}
-
-				.search_icon {
-					font-size: 36rpx;
-					color: #BBBBBB;
-					margin-left: 10rpx;
+				
+				.input_wrap {
+					// width: 540rpx;
+					flex:1;
+					height: 64rpx;
+					background: #FFFFFF;
+					border-radius: 10rpx;
+					padding: 0 20rpx;
+					align-items: center;
+				
+					input {
+						width: 100%;
+						height: 100%;
+					}
+				
+					.search_icon {
+						font-size: 36rpx;
+						color: #BBBBBB;
+						margin-left: 10rpx;
+					}
 				}
 			}
 		}
@@ -443,7 +537,8 @@
 		}
 
 		.advertisement_wrap {
-			// height: 286rpx;
+			height: 286rpx;
+			// min-height: 100rpx;
 			border-radius: 10rpx;
 			margin-top: 20rpx;
 			position: relative;
@@ -474,6 +569,7 @@
 		.advertisement_wrap2 {
 			width: 646rpx;
 			// height: 266rpx;
+			height: 286rpx;
 			border-radius: 10rpx;
 			margin: 28rpx auto;
 			position: relative;

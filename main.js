@@ -16,6 +16,9 @@ Vue.component('topbar',topbar)
 import tabList from '@/components/tab-list/tab-list.vue'
 Vue.component('tab-list',tabList)
 
+//富文本
+import uParse from '@/components/gaoyia-parse/parse.vue'
+Vue.component('uParse',uParse)
 // 混入
 import mixins from '@/mixins/mixins.js'
 Vue.mixin(mixins)

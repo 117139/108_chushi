@@ -33,7 +33,7 @@
 				<view >{{item.content}}</view>
 			</view>
 
-			<view class="img_list flex">
+			<view class="img_list flex fww">
 				<view  class="img_li" v-for="(item1,index2) in item.img_arr" :key="index2">
 					<image :src="$service.getimg(item1)" mode="aspectFill"></image>
 				</view>
@@ -41,7 +41,7 @@
 			<view class="list_botm flex_bet">
 				<view class=" flex_ali">
 					<text class="icon icon-dizhi add_icon"></text>
-					<view class="">
+					<view class="address_name oh1">
 						{{item.address}}
 					</view>
 				</view>
@@ -551,5 +551,10 @@
 			text-align: center;
 			margin-top: 200rpx;
 		}
+	}
+	.address_name{
+		width: 620rpx;
+		line-height: 36rpx;
+		height: 36rpx;
 	}
 </style>

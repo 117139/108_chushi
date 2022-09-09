@@ -65,7 +65,7 @@
 				<!-- <view class="">
 					{{phone}}
 				</view> -->
-				<input class="user_tel" type="text" v-model="phone" placeholder="请输入手机号">
+				<input class="user_tel" type="number" v-model="phone" placeholder="请输入手机号">
 			</view>
 			<view class="user_news_line area2 flex_bet">
 				<view class="sort_tit flex_ali">

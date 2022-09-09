@@ -43,12 +43,12 @@
 				<view>举报</view>
 			</view>
 			<!-- #ifdef MP-WEIXIN -->
-			<view class="advertisement_wrap area2">
+			<view v-if="basedata.key_1" class="advertisement_wrap area2">
 				<!-- <image :src="imgUrl2" mode="aspectFill"></image>
 				<view class="advertisement_text">
 					广告
 				</view> -->
-				<ad class="advertisement_wrap area2" unit-id="adunit-5c7042d2485a2640"></ad>
+				<ad class="advertisement_wrap area2" :unit-id="basedata.key_1"></ad>
 			</view>
 			<!-- #endif -->
 			<view class="botm_btn bottom-button flex_aro">
@@ -113,8 +113,12 @@
 		},
 		onShareAppMessage() {
 			var up_id=that.loginDatas.id||''
+			if(up_id){
+				that.getsharejf_fuc()
+			}
 			return {
 				title: '招厨师群',
+				imageUrl:that.basedata.share_index,
 				path: '/pages/index/index?up_id='+up_id
 			}
 		},

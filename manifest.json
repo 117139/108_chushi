@@ -86,7 +86,8 @@
         "template" : "main.html",
         "title" : "招厨师群",
         "router" : {
-            "mode" : "hash"
+            "mode" : "hash",
+            "base" : "/h5/"
         },
         "optimization" : {
             "treeShaking" : {

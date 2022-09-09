@@ -6,11 +6,11 @@ const STATE_KEY = 'STATE_KEY';
 const map_key = "7FEBZ-WLWK2-PMGUE-C4BFT-EKXB6-BFFNR"
 const appVN=1
 // const baseurl = "https://ayi.a.800123456.vip/"
-const baseurl = "http://cook.a.800123456.vip/"
+const baseurl = "https://cook.a.800123456.vip/"
 // const baseurl = "http://tumei.xyz/"
 let imgurl = baseurl
 var  IPurl = baseurl + 'api/'
-var  share_H5='http://192.168.0.111:8083/#/'
+var  share_H5='https://cook.a.800123456.vip/index.html#/'
 const limit=20
 // if(appVN==0){
 // 	imgurl='https://www.wanbonet.com/suxin/106_dianshang/'
@@ -578,7 +578,7 @@ const wx_upload = function(tximg,type) {
 			mask: true,
 			title: '正在上传'
 		})
-		// #ifndef H5
+		// #ifndef APP
 		console.log(tximg)
 		var jkurl='/login/img_upload'
 		// if(type==1){
@@ -635,6 +635,7 @@ const wx_upload = function(tximg,type) {
 			}
 		});
 		// #endif
+		return
 		// #ifdef H5
 		uni.request({
 				url: tximg,
@@ -2092,16 +2093,20 @@ const getKm=function(num) {
 }
 
 const copy_fuc=function(){
-	uni.setClipboardData({
-		data: share_H5,
-		success: function () {
-			console.log('success');
-			uni.showToast({
-				icon:'none',
-				title:'分享链接已复制到剪切板，快去分享'
-			})
-		}
-	});
+	var loginDatas=store.state.loginDatas
+	if(loginDatas.id){
+		uni.setClipboardData({
+			data: share_H5+'?pid='+loginDatas.id,
+			success: function () {
+				console.log('success');
+				uni.showToast({
+					icon:'none',
+					title:'分享链接已复制到剪切板，快去分享'
+				})
+			}
+		});
+	}
+	
 }
 export default {
 	getUsers,

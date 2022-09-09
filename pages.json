@@ -4,7 +4,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "厨师招聘"
+				"navigationBarTitleText": "厨师招聘",
+				"navigationStyle": "custom"
 			}
 		}, {
 			"path": "pages/follow/follow",

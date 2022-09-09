@@ -46,12 +46,16 @@
 		<view class="botm_btn flex_aro">
 			
 			<!-- #ifdef H5 -->
-			<view class="btn_one btn_one1" @tap="$service.copy_fuc">
+			<view class="btn_one" @tap="$service.copy_fuc">
 				立即邀请
+			</view>
+			<view class="btn_two" @tap="codeClick">
+				生成专属二维码
 			</view>
 			<!-- #endif -->
 			<!-- #ifdef MP-WEIXIN -->
-			<view class="btn_one" @tap="$service.copy_fuc">
+			<view class="btn_one">
+					<button open-type="share" class="share_wrap_btn"></button>
 				立即邀请
 			</view>
 			<view class="btn_two" @tap="codeClick">
@@ -64,9 +68,17 @@
 			<view class="pop_wrap" @tap.stop>
 				<!-- <image src="@/static/images/sczsewm.jpg" mode="aspectFill"></image> -->
 				<image :src="img_src" mode="widthFix" class="posterImage1"></image>
+				
+				<!-- #ifdef H5 -->
+				<view class="keep_img" >
+					截图或长按保存图片
+				</view>
+				<!-- #endif -->
+				<!-- #ifdef MP-WEIXIN -->
 				<view class="keep_img" @click="saveImage">
 					保存图片，分享到厨师群
 				</view>
+				<!-- #endif -->
 				<view class="cut_out" @tap="codeClick">
 					x
 				</view>
@@ -141,16 +153,33 @@
 		computed: {
 		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata','loginDatas']),
 		},
+		onShareAppMessage() {
+			var up_id=that.loginDatas.id||''
+			return {
+				title: '招厨师群',
+				imageUrl:that.basedata.share_index,
+				path: '/pages/index/index?up_id='+up_id
+			}
+		},
 		onLoad() {
 			that=this
 			this.onRetry()
 			// that.yq_code=that.loginDatas.identification_id
+			// #ifdef MP-WEIXIN
 			if(that.loginDatas.code_img){
 				that.img_src=that.loginDatas.code_img
 			}else{
 				this.shareFc();
 			}
-			
+			// #endif
+			// #ifdef H5
+			// that.img_src=that.loginDatas.code_img
+			if(that.loginDatas.synthesis_img){
+				that.img_src=that.loginDatas.synthesis_img
+			}else{
+				this.shareFc();
+			}
+			// #endif
 		},
 		onReachBottom() {
 			that.getdatas()
@@ -364,7 +393,13 @@
 									
 									type: 'image',
 									id: 'productImage_code',
+									// #ifdef MP-WEIXIN
 									url: that.$service.imgurl+that.$store.state.loginDatas.invite_img,
+									// #endif
+									// #ifdef H5
+									url: that.$service.imgurl+that.$store.state.loginDatas.web_img,
+									// #endif
+									
 									dx:554,
 									dy:1725,
 									serialNum: 0,
@@ -437,30 +472,36 @@
 			},
 			saveImage() {
 				var that = this;
+				if(!this.img_src){
+					return
+				}
 				// #ifdef MP-WEIXIN
-				uni.saveImageToPhotosAlbum({
-					filePath: this.poster.finalPath,
-					success(res) {
-						uni.shareWithSystem({
-							type:'image',
-						  summary: '邀请码：'+that.yq_code,
-							href: 'https://uniapp.dcloud.io',
-							imageUrl:res.path,
-						  success(){
-						    // 分享完成，请注意此时不一定是成功分享
-						  },
-						  fail(){
-						    // 分享失败
-						  }
-						})
+				uni.downloadFile({
+					url: this.img_src, //仅为示例，并非真实的资源
+					success: (res) => {
+						if (res.statusCode === 200) {
+							console.log('下载成功');
+							uni.saveImageToPhotosAlbum({
+								filePath: res.tempFilePath,
+								success(res) {
+									console.log(res)
+									uni.showToast({
+										icon:'none',
+										title:'保存成功'
+									})
+								}
+							})
+							
+						}
 					}
-				})
+				});
 				
 				return
 				// #endif
-				// #ifndef H5
+				// #ifdef H5
 				uni.saveImageToPhotosAlbum({
-					filePath: this.poster.finalPath,
+					// filePath: this.poster.finalPath,
+					filePath: this.img_src,
 					success(res) {
 						_app.showToast('已保存至本地，快去分享吧');
 					}
@@ -500,7 +541,7 @@
 					console.log(res)
 					if (res.code == 1) {
 						// var datas = res.data
-						that.img_src=res.data
+						that.img_src=that.$service.getimg(res.data)
 						var jkurl='/login/upload_code'
 						var datas={
 							img:res.data
@@ -570,6 +611,10 @@
 				})
 			},
 			codeClick() { //生成二维码
+			if(!this.img_src){
+				this.shareFc()
+				return
+			}
 				this.isShow = !this.isShow
 			},
 			promptly(){//立即邀请
@@ -725,6 +770,7 @@
 				font-family: PingFang SC;
 				font-weight: 400;
 				color: #FFFFFF;
+				position: relative;
 				&.btn_one1{
 					width: 676rpx;
 				}

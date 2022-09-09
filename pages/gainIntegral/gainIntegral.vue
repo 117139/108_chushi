@@ -27,7 +27,7 @@
 				<view class="">
 					看视频送积分
 				</view>
-				<view class="content_text">
+				<view class="content_text" @click="setad">
 					去观看
 				</view>
 			</view>
@@ -52,33 +52,101 @@
 		},
 		
 		computed: {
-			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata']),
+			...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','tab_list','my_address','basedata','loginDatas']),
 		},
 		
 		onShareAppMessage() {
 			var up_id=that.loginDatas.id||''
+			
+			if(up_id){
+				that.getsharejf_fuc()
+			}
 			return {
 				title: '招厨师群',
+				imageUrl:that.basedata.share_index,
 				path: '/pages/index/index?up_id='+up_id
 			}
 		},
 		onLoad() {
 			that=this
 			// this.getCate()
+			// #ifdef MP-WEIXIN
+			if(that.basedata.key_2){
+				if (wx.createRewardedVideoAd) {
+					videoAd = wx.createRewardedVideoAd({
+					  // adUnitId: 'adunit-06d5a767981630e7'
+					  adUnitId: that.basedata.key_2||'adunit-06d5a767981630e7'
+					})
+					videoAd.onLoad(() => {})
+					videoAd.onError((err) => {})
+					videoAd.onClose((res) => {
+						uni.hideLoading()
+						that.getjf(res)
+					})
+				}
+			  
+			}
+			// #endif
 		},
 		methods: {
-			// copy_fuc(){
-			// 	uni.setClipboardData({
-			// 		data: that.$service.share_H5,
-			// 		success: function () {
-			// 			console.log('success');
-			// 			uni.showToast({
-			// 				icon:'none',
-			// 				title:'分享链接已复制到剪切板，快去分享'
-			// 			})
-			// 		}
-			// 	});
-			// },
+			// 激励广告
+			setad(){
+				var that=this
+				// 在页面中定义激励视频广告
+				// 在页面onLoad回调事件中创建激励视频广告实例
+				/* #ifdef MP-WEIXIN */
+				
+				
+				
+				uni.showLoading({
+					mask:true,
+					title:'正在加载广告'
+				})
+				setTimeout(function(){
+					
+						uni.hideLoading()
+				},2000)
+				// // 用户触发广告后，显示激励视频广告
+				if (videoAd) {
+				  videoAd.show().catch(() => {
+				    // 失败重试
+				    videoAd.load()
+				      .then(() => videoAd.show())
+				      .catch(err => {
+								uni.hideLoading()
+				        console.log('激励视频 广告显示失败')
+				      })
+				  })
+				}else{
+					if(that.basedata.key_2){
+						if (wx.createRewardedVideoAd) {
+							videoAd = wx.createRewardedVideoAd({
+							  // adUnitId: 'adunit-06d5a767981630e7'
+							  adUnitId: that.basedata.key_2||'adunit-06d5a767981630e7'
+							})
+							videoAd.onLoad(() => {})
+							videoAd.onError((err) => {})
+							videoAd.onClose((res) => {
+								uni.hideLoading()
+								that.getjf(res)
+							})
+						}
+					  if (videoAd) {
+					    videoAd.show().catch(() => {
+					      // 失败重试
+					      videoAd.load()
+					        .then(() => videoAd.show())
+					        .catch(err => {
+					          console.log('激励视频 广告显示失败')
+					        })
+					    })
+					  }
+					}
+					
+				}
+				/* #endif */
+			},
+			
 			getCate() { //判断显示静态页 还是 数据页
 				if (this.$sjuNav.appVn == 0) {
 					this.list=[
