@@ -115,7 +115,9 @@
 				num: 10, //扣除积分
 				
 				content:'',
-				img_arr:[]
+				img_arr:[],
+				
+				btn_kg:0
 			}
 		},
 		computed: {
@@ -168,6 +170,10 @@
 				var header={
 					'content-type': 'application/json',
 				}
+				if(that.btn_kg==1){
+					return
+				}
+				that.btn_kg=1
 				that.$service.P_post(jkurl, datas,header).then(res => {
 					that.btnkg = 0
 					console.log(res)
@@ -186,12 +192,14 @@
 							title: '发布成功'
 						})
 						setTimeout(function(){
+							that.btn_kg=0
 							uni.redirectTo({
 								url:'/pages/index/index'
 							})
 						},1000)
 					} else {
-					
+						
+						that.btn_kg=0
 						if (res.msg) {
 							uni.showToast({
 								icon: 'none',
@@ -206,7 +214,7 @@
 					}
 				}).catch(e => {
 					that.htmlReset = 1
-					that.btnkg = 0
+					that.btn_kg=0
 					// that.$refs.htmlLoading.htmlReset_fuc(1)
 					console.log(e)
 					uni.showToast({
@@ -403,11 +411,14 @@
 				this.checked = e.detail.value
 			},
 			chooseLocation(e) {//发布地址
-				console.log(e);
+				// console.log(e);
 				uni.chooseLocation({
 					success: res => {
 						console.log(res)
 						this.address = res
+					},
+					fail(res) {
+						console.log(res)
 					}
 				})
 

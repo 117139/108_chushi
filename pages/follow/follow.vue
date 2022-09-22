@@ -12,6 +12,7 @@
 		</view>
 		<!-- 关注我 -->
 		<tab-list pageurl="/pages/follow/follow" :weburl="web_url"></tab-list>
+		
 	</view>
 </template>
 

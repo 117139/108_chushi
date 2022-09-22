@@ -313,7 +313,7 @@
 			},
 			
 			
-			async shareFc() {
+			async shareFc(num) {
 				let _this = this;
 				console.log(that.basedata.code)
 				try {
@@ -425,7 +425,7 @@
 					that.poster.finalPath = d.poster.tempFilePath;
 					that.qrShow = true;
 					that.img_src = d.poster.tempFilePath
-					that.up_ewm()
+					that.up_ewm(num)
 					// uni.showToast({
 					// 	title:that.src
 					// })
@@ -533,7 +533,7 @@
 					return
 				}
 			},
-			up_ewm(){
+			up_ewm(num){
 				
 				that.$service.wx_upload(that.img_src).then(res => {
 							
@@ -543,6 +543,9 @@
 						// var datas = res.data
 						that.img_src=that.$service.getimg(res.data)
 						var jkurl='/login/upload_code'
+						// #ifdef H5
+						jkurl='/login/upload_img'
+						// #endif
 						var datas={
 							img:res.data
 						}
@@ -558,11 +561,13 @@
 								var datas = res.data
 								console.log(typeof datas)
 						
-								if (typeof datas == 'string') {
-									datas = JSON.parse(datas)
-								}
+								// if (typeof datas == 'string') {
+								// 	datas = JSON.parse(datas)
+								// }
 								console.log(res)
-								
+								if(num==1){
+									that.isShow = !that.isShow
+								}
 							} else {
 							
 								if (res.msg) {
@@ -611,10 +616,12 @@
 				})
 			},
 			codeClick() { //生成二维码
-			if(!this.img_src){
-				this.shareFc()
-				return
-			}
+				// this.shareFc(1)
+				// return
+				if(!this.img_src){
+					this.shareFc(1)
+					return
+				}
 				this.isShow = !this.isShow
 			},
 			promptly(){//立即邀请

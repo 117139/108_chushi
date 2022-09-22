@@ -8,12 +8,14 @@
 	export default {
 		onLaunch: function() {
 			that=this
+			var adurl_list=[]
+			uni.setStorageSync('adurl_list',adurl_list)
 			console.log('App Launch')
 			var token =uni.getStorageSync('token')
 			if(token){
 				that.$service.wxlogin('token')
 			}
-			that.getadd()
+			// that.getadd()
 			that.gettabs()
 			that.getbasedata()
 			uni.$on('login_fuc', (data) => {
@@ -65,16 +67,16 @@
 				
 				that.$service.P_get(jkurl, datas).then(res => {
 					that.btnkg = 0
-					console.log(res)
+					// console.log(res)
 					if (res.code == 1) {
-						that.htmlReset = 0
+						// that.htmlReset = 0
 						var datas = res.data
 						console.log(typeof datas)
 				
 						if (typeof datas == 'string') {
 							datas = JSON.parse(datas)
 						}
-						console.log(res)
+						// console.log(res)
 						that.$store.commit('set_tab_list',res.data)
 						// that.getdata_tz()
 						// if(datas.title){
@@ -97,7 +99,7 @@
 						}
 					}
 				}).catch(e => {
-					that.htmlReset = 1
+					// that.htmlReset = 1
 					that.btnkg = 0
 					// that.$refs.htmlLoading.htmlReset_fuc(1)
 					console.log(e)
@@ -113,9 +115,9 @@
 				
 				that.$service.P_get(jkurl, datas).then(res => {
 					that.btnkg = 0
-					console.log(res)
+					// console.log(res)
 					if (res.code == 1) {
-						that.htmlReset = 0
+						// that.htmlReset = 0
 						var datas = res.data
 						console.log(typeof datas)
 				
@@ -135,6 +137,7 @@
 						}
 						var address={
 							city:city,
+							address:city,
 							longitude:rectangle[0]||'',
 							latitude:rectangle[1]||'',
 						}
@@ -161,7 +164,7 @@
 						}
 					}
 				}).catch(e => {
-					that.htmlReset = 1
+					// that.htmlReset = 1
 					that.btnkg = 0
 					// that.$refs.htmlLoading.htmlReset_fuc(1)
 					console.log(e)
@@ -177,17 +180,18 @@
 				
 				that.$service.P_get(jkurl, datas).then(res => {
 					that.btnkg = 0
-					console.log(res)
+					// console.log(res)
 					if (res.code == 1) {
-						that.htmlReset = 0
+						// that.htmlReset = 0
 						var datas = res.data
 						console.log(typeof datas)
 				
 						if (typeof datas == 'string') {
 							datas = JSON.parse(datas)
 						}
-						console.log(res)
+						// console.log(res)
 						that.$store.commit('set_basedata',res.data)
+						
 						// that.getdata_tz()
 						// if(datas.title){
 						// 	uni.setNavigationBarTitle({
@@ -209,7 +213,7 @@
 						}
 					}
 				}).catch(e => {
-					that.htmlReset = 1
+					// that.htmlReset = 1
 					that.btnkg = 0
 					// that.$refs.htmlLoading.htmlReset_fuc(1)
 					console.log(e)

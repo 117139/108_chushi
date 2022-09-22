@@ -6,11 +6,18 @@ const STATE_KEY = 'STATE_KEY';
 const map_key = "7FEBZ-WLWK2-PMGUE-C4BFT-EKXB6-BFFNR"
 const appVN=1
 // const baseurl = "https://ayi.a.800123456.vip/"
-const baseurl = "https://cook.a.800123456.vip/"
+const baseurl = "https://wechat.99zpw.cn/"
+// // #ifndef H5
+// const baseurl = "https://cook.a.800123456.vip/"
+// // #endif
+// // const baseurl = "http://192.168.0.113/"
+// // #ifdef H5
+// const baseurl = "http://192.168.0.113/"
+// // #endif
 // const baseurl = "http://tumei.xyz/"
 let imgurl = baseurl
 var  IPurl = baseurl + 'api/'
-var  share_H5='https://cook.a.800123456.vip/index.html#/'
+var  share_H5='https://wechat.99zpw.cn/index.html#/'
 const limit=20
 // if(appVN==0){
 // 	imgurl='https://www.wanbonet.com/suxin/106_dianshang/'
@@ -65,12 +72,19 @@ const addUser = function(userInfo) {
 	uni.setStorageSync(USERS_KEY, JSON.stringify(users));
 }
 
-
+var jump_btn=false
 const jump = function(e) {
 	// console.log(e.currentTarget.dataset.type)
 	var datas = e.currentTarget.dataset
 	console.log(datas.login == true)
 	console.log(store.state.hasLogin)
+	if(jump_btn){
+		return
+	}
+	jump_btn=true
+	setTimeout(function(){
+		jump_btn=false
+	},2000)
 	if (datas.login == true) {
 		if (!store.state.hasLogin) {
 			// uni.navigateTo({
@@ -578,7 +592,7 @@ const wx_upload = function(tximg,type) {
 			mask: true,
 			title: '正在上传'
 		})
-		// #ifndef APP
+		// #ifndef H5
 		console.log(tximg)
 		var jkurl='/login/img_upload'
 		// if(type==1){
@@ -635,7 +649,7 @@ const wx_upload = function(tximg,type) {
 			}
 		});
 		// #endif
-		return
+		// return
 		// #ifdef H5
 		uni.request({
 				url: tximg,
@@ -782,19 +796,19 @@ const http = ({
 					})
 					return
 				} else if (res.data.code == 0) {
-					if (res.data.msg) {
-				
-						uni.showToast({
-							icon: 'none',
-							title: res.data.msg
-						})
-					} else {
-				
-						uni.showToast({
-							icon: 'none',
-							title: '操作失败'
-						})
-					}
+					// 	if (res.data.msg) {
+					
+					// 		uni.showToast({
+					// 			icon: 'none',
+					// 			title: res.data.msg
+					// 		})
+					// 	} else {
+					
+					// 		uni.showToast({
+					// 			icon: 'none',
+					// 			title: '操作失败'
+					// 		})
+					// 	}
 				}
 				// if(res.data.code == 2){
 				// 	uni.showModal({
@@ -2070,7 +2084,9 @@ const LNum=function(txt,num) {
 	return str
 }
 const getKm=function(num) {
-	
+	if(num=='--'){
+		return num
+	}
 	if(!num){
 		return "0m"
 	}

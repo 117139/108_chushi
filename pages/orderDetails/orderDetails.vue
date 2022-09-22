@@ -234,13 +234,13 @@
 									var datas = res.data
 									console.log(typeof datas)
 							
-									if (typeof datas == 'string') {
-										datas = JSON.parse(datas)
-									}
+									// if (typeof datas == 'string') {
+									// 	datas = JSON.parse(datas)
+									// }
 									console.log(res)
 									
 									uni.makePhoneCall({
-										phoneNumber: e
+										phoneNumber: datas
 									});
 								} else {
 								

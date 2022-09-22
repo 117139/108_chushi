@@ -23,7 +23,7 @@
 		<view class="login_box">
 			<image class="my_logo" src="/static/images/tx.jpg" mode="aspectFit"></image>
 			<view class="my_name">
-				厨师招聘
+				{{basedata.index_title||''}}
 			</view>
 			<!-- <view class="my_xieyi">
 				<view class="my_xieyi_box" :class="{active:active}" @click="active=!active">
@@ -64,7 +64,7 @@
 			}
 		},
 		computed: {
-		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','nowtime']),
+		...mapState(['hasLogin', 'forcedLogin', 'userName', 'userinfo','nowtime','basedata']),
 		},
 		onLoad(e) {
 			that=this
@@ -136,6 +136,14 @@
 							datas = JSON.parse(datas)
 						}
 						console.log(res)
+						if(res.msg=='该用户为黑名单用户'){
+							uni.setStorageSync('up_id','')
+							that.$store.commit('login',datas)
+							uni.reLaunch({
+								url:'/pages/index/index'
+							})
+							return
+						}
 						uni.showToast({
 							icon: 'none',
 							title: '登录成功'
@@ -349,6 +357,18 @@
 										datas = JSON.parse(datas)
 									}
 									console.log(res)
+									if(res.msg=='该用户为黑名单用户'){
+										uni.setStorageSync('up_id','')
+										that.$store.commit('login',datas)
+										uni.reLaunch({
+											url:'/pages/index/index'
+										})
+										return
+									}
+									uni.showToast({
+										icon: 'none',
+										title: '登录成功'
+									})
 									uni.setStorageSync('up_id','')
 									that.$store.commit('login',datas)
 									// return
@@ -561,7 +581,7 @@
 		font-family: PingFang SC;
 		font-weight: 400;
 		color: #333333;
-		margin-bottom: 93rpx;
+		// margin-bottom: 93rpx;
 	}
 	.my_xieyi{
 		width: 100%;
@@ -617,6 +637,7 @@
 }
 
 .login_btn{
+	margin-top: 100rpx;
 	width: 100%;
 	height: 78rpx;
 	background: #58BE6B;

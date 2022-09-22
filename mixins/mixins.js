@@ -37,7 +37,7 @@ export default {
 					var adurl_list=uni.getStorageSync('adurl_list')||[]
 					adurl_list.push(_this.my_purl)
 					uni.setStorageSync('adurl_list',adurl_list)
-			  	_this.getjf1()
+			  	// _this.getjf1()
 			  })
 				
 			}
@@ -91,7 +91,7 @@ export default {
 							var adurl_list=uni.getStorageSync('adurl_list')||[]
 							adurl_list.push(_that.my_purl)
 							uni.setStorageSync('adurl_list',adurl_list)
-							_that.getjf1()
+							// _that.getjf1()
 						})
 					}
 					if (interstitialAd) {
@@ -136,7 +136,7 @@ export default {
 			}
 			that.$service.P_post(jkurl, datas,header).then(res => {
 				that.btnkg = 0
-				console.log(res)
+				// console.log(res)
 				if (res.code == 1) {
 					that.htmlReset = 0
 					var datas = res.data
@@ -145,13 +145,15 @@ export default {
 					if (typeof datas == 'string') {
 						datas = JSON.parse(datas)
 					}
-					console.log(res)
+					// console.log(res)
 					if(datas.show==1){
 						that.my_tk_adkey=datas.key
 						that.setad_tk()
 					}
 				} else {
-				
+					if (res.msg=='今日次数已用完') {
+						return					
+					}
 					if (res.msg) {
 						uni.showToast({
 							icon: 'none',
@@ -217,7 +219,9 @@ export default {
 						content: 'item.id'
 					});
 				} else {
-				
+					if (res.msg=='当日观看广告已达上限') {
+						return					
+					}
 					if (res.msg) {
 						uni.showToast({
 							icon: 'none',
@@ -272,7 +276,9 @@ export default {
 						content: 'item.id'
 					});
 				} else {
-				
+					if (res.msg=='当日分享好友已达上限') {
+						return					
+					}
 					if (res.msg) {
 						uni.showToast({
 							icon: 'none',

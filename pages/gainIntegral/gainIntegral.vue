@@ -21,7 +21,7 @@
 			</view>
 		</view>
 		<!-- #ifdef MP-WEIXIN -->
-		<view class="list_wrap area2">
+		<view v-if="basedata.key_2" class="list_wrap area2">
 			<image src="/static/images/hqjfbj.png" mode="aspectFill"></image>
 			<view class="list_content flex_bet">
 				<view class="">
@@ -62,7 +62,7 @@
 				that.getsharejf_fuc()
 			}
 			return {
-				title: '招厨师群',
+				title: that.basedata.index_title||'厨师群',
 				imageUrl:that.basedata.share_index,
 				path: '/pages/index/index?up_id='+up_id
 			}

@@ -182,6 +182,7 @@
 	// 		}
 	// 	]
 	// },
+	"requiredPrivateInfos": ["chooseLocation"],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "厨师招聘",

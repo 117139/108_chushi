@@ -6,7 +6,7 @@
 		</view>
 		<view class="location_address flex_bet" @tap="chooseLocation">
 			<view class="address_word">
-				{{address.address?address.address:'请选择地址'}}
+				{{address.address?address.address:'请选择定位'}}
 			</view>
 			<view class="location_r flex_ali">
 				<view class="icon icon-dizhi address_icon"></view>
@@ -118,9 +118,15 @@
 							...that.address
 						}
 						that.$store.commit('set_my_address',address)
-						uni.navigateBack({
-							delta:1
-						})
+						uni.$emit('set_index_add', {
+							title: ' 刷新信息 ',
+							content: 'item.id'
+						});
+						setTimeout(function(){
+							uni.navigateBack({
+								delta:1
+							})
+						},100)
 					} else {
 					
 						if (res.msg) {

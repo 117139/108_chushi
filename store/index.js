@@ -33,7 +33,7 @@ const store = new Vuex.Store({
 		basedata:'',
 		tab_list:[],
 		my_address:{
-			city:'北京市',
+			city:'选择城市',
 			longitude:'',
 			latitude:'',
 		}, //地址信息

@@ -228,6 +228,10 @@
 					lng:that.address.longitude,
 					lat:that.address.latitude,
 				}
+				if(that.btn_kg==1){
+					return
+				}
+				that.btn_kg=1
 				var header={
 					'content-type': 'application/json',
 				}
@@ -249,11 +253,13 @@
 							title: '发布成功'
 						})
 						setTimeout(function(){
+							that.btn_kg=0
 							uni.redirectTo({
 								url:'/pages/index/index'
 							})
 						},1000)
 					} else {
+						that.btn_kg=0
 					
 						if (res.msg) {
 							uni.showToast({
@@ -269,7 +275,7 @@
 					}
 				}).catch(e => {
 					that.htmlReset = 1
-					that.btnkg = 0
+					that.btn_kg=0
 					// that.$refs.htmlLoading.htmlReset_fuc(1)
 					console.log(e)
 					uni.showToast({
